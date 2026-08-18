@@ -2513,7 +2513,7 @@ Use this flow when React Native wireless debugging stops working on the Vivo 172
                                                          ↓           ↓
                                                         NO          YES
                                                          ↓           ↓
-                                                 bunx react-    Check port
+                                                 npx react-    Check port
                                                  native start      8081
                                                                     ↓
                                                          ┌──────────┴──────────┐
@@ -2582,7 +2582,7 @@ adb connect PHONE_IP:5555
 # 2. Run React Native
 
 ```bash
-bunx react-native run-android
+npx react-native run-android
 ```
 
 Now identify **where the command fails**.
@@ -2619,7 +2619,7 @@ cd ..
 Try again:
 
 ```bash
-bunx react-native run-android
+npx react-native run-android
 ```
 
 ---
@@ -2702,7 +2702,7 @@ move to **Metro troubleshooting**.
 Start Metro:
 
 ```bash
-bunx react-native start
+npx react-native start
 ```
 
 You should see:
@@ -2888,10 +2888,10 @@ Then:
 
 ```bash
 # Start Metro
-bunx react-native start
+npx react-native start
 
 # Run React Native
-bunx react-native run-android
+npx react-native run-android
 ```
 
 ---
