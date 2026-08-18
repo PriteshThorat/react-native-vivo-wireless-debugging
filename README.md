@@ -998,3 +998,673 @@ Investigate:
 **Phone storage / APK installation / device communication**
 
 > **Most important rule:** If Gradle successfully builds the APK and reaches `installDebug`, the Android SDK/build process has already progressed far enough. Read the installation error before changing SDK configuration.
+
+## 4. APK Installation Problems
+
+This section covers problems that occur **after Gradle successfully builds the APK**, but React Native fails while installing it on the Android device.
+
+---
+
+### Problem 1 — `InstallException: EOF`
+
+Example:
+
+```text
+> Task :app:installDebug FAILED
+
+[Device]: Error during Sync: EOF
+
+com.android.ddmlib.InstallException: EOF
+
+Caused by: java.io.EOFException: EOF
+at com.android.ddmlib.SyncService.doPushFile(...)
+````
+
+This means the APK was built successfully, but ADB failed while transferring/installing the APK on the device.
+
+The important part is:
+
+```text
+Error during Sync: EOF
+```
+
+and:
+
+```text
+SyncService.doPushFile
+```
+
+This is usually an **ADB/device communication or device-side installation problem**, not a React Native JavaScript problem.
+
+---
+
+### Step 1 — Check whether the device is still connected
+
+Run:
+
+```cmd
+adb devices
+```
+
+Expected:
+
+```text
+List of devices attached
+192.168.x.x:5555    device
+```
+
+If it shows:
+
+```text
+offline
+```
+
+restart ADB:
+
+```cmd
+adb kill-server
+adb start-server
+adb devices
+```
+
+If using wireless ADB, reconnect:
+
+```cmd
+adb connect PHONE_IP:5555
+```
+
+---
+
+### Step 2 — Try installing the APK manually
+
+First make sure the APK exists:
+
+```text
+android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Then install it manually:
+
+```cmd
+adb install -r "D:\Projects\ReactNativeTest1\android\app\build\outputs\apk\debug\app-debug.apk"
+```
+
+If it succeeds:
+
+```text
+Performing Streamed Install
+Success
+```
+
+then:
+
+* APK was built correctly
+* Android SDK is working
+* ADB can communicate with the phone
+* APK installation itself works
+
+This is a very useful diagnostic test.
+
+---
+
+### Problem 2 — `Requested internal only, but not enough space`
+
+Example:
+
+```text
+Requested internal only, but not enough space
+```
+
+This means the phone does not have enough **internal storage** to install the APK.
+
+It is generally **not**:
+
+* React Native code problem
+* Gradle problem
+* Android SDK problem
+* Metro problem
+* Wi-Fi problem
+
+### Check phone storage
+
+You can use:
+
+```cmd
+adb shell df -h /data
+```
+
+If the available space is very low, free storage on the phone.
+
+Remove or move:
+
+* Large videos
+* Downloads
+* WhatsApp media
+* Unused applications
+* Old APK files
+* Other large files
+
+Then try:
+
+```bash
+npx react-native run-android
+```
+
+---
+
+### Problem 3 — Installation works manually but `run-android` fails
+
+Sometimes this works:
+
+```cmd
+adb install -r "D:\Projects\ReactNativeTest1\android\app\build\outputs\apk\debug\app-debug.apk"
+```
+
+but:
+
+```bash
+npx react-native run-android
+```
+
+fails during installation.
+
+If manual installation succeeds, check the ADB connection used by React Native/Gradle.
+
+Run:
+
+```cmd
+adb devices -l
+```
+
+Then verify the exact device serial.
+
+Example:
+
+```text
+192.168.1.15:5555    device
+```
+
+You can also start the application manually:
+
+```cmd
+adb -s 192.168.1.15:5555 shell am start -n com.reactnativetest1/.MainActivity
+```
+
+If the app opens, the APK installation is working.
+
+---
+
+### Problem 4 — `more than one device/emulator`
+
+Example:
+
+```text
+adb.exe: error: more than one device/emulator
+```
+
+This happens when ADB sees multiple devices/emulators.
+
+Check:
+
+```cmd
+adb devices -l
+```
+
+Example:
+
+```text
+List of devices attached
+emulator-5554          device
+192.168.1.15:5555      device
+```
+
+Specify the device explicitly:
+
+```cmd
+adb -s 192.168.1.15:5555 install -r "D:\Projects\ReactNativeTest1\android\app\build\outputs\apk\debug\app-debug.apk"
+```
+
+For other ADB commands:
+
+```cmd
+adb -s 192.168.1.15:5555 shell
+```
+
+```cmd
+adb -s 192.168.1.15:5555 reverse tcp:8081 tcp:8081
+```
+
+### Important
+
+If `adb devices -l` shows only one device but ADB still reports:
+
+```text
+more than one device/emulator
+```
+
+do **not** immediately assume that there are actually two phones.
+
+Check for multiple ADB installations/processes.
+
+```cmd
+where adb
+```
+
+For example:
+
+```text
+C:\Users\Admin\AppData\Local\Android\Sdk\platform-tools\adb.exe
+C:\scrcpy-win64-v3.3.3\adb.exe
+```
+
+Also check:
+
+```cmd
+tasklist | findstr /i "adb scrcpy"
+```
+
+If necessary, close applications using ADB, such as:
+
+* Android Studio
+* scrcpy
+* VS Code terminals running ADB commands
+* Other Android debugging tools
+
+Then restart ADB:
+
+```cmd
+adb kill-server
+adb start-server
+adb devices -l
+```
+
+---
+
+### Problem 5 — `adb reverse` fails
+
+React Native normally uses port `8081` for Metro.
+
+For a USB-connected device, you can use:
+
+```cmd
+adb reverse tcp:8081 tcp:8081
+```
+
+Then the phone can access Metro through the reverse ADB connection.
+
+For a wireless device:
+
+```cmd
+adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081
+```
+
+Example:
+
+```cmd
+adb -s 192.168.1.15:5555 reverse tcp:8081 tcp:8081
+```
+
+If you receive:
+
+```text
+adb.exe: error: more than one device/emulator
+```
+
+check:
+
+```cmd
+adb devices -l
+```
+
+and investigate multiple ADB connections/processes.
+
+---
+
+### Problem 6 — App installs but shows `Unable to load script`
+
+Example:
+
+```text
+Unable to load script.
+
+If you're using USB on a physical device, make sure you
+also run this command:
+
+adb reverse tcp:8081 tcp:8081
+```
+
+This means the APK was installed and launched, but the React Native application cannot reach the **Metro development server**.
+
+This is different from an APK installation failure.
+
+First check that Metro is running:
+
+```text
+Welcome to Metro v0.84.4
+
+INFO  Dev server ready.
+```
+
+Then check:
+
+```cmd
+adb devices
+```
+
+If the device is connected, try:
+
+```cmd
+adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081
+```
+
+---
+
+### Problem 7 — Metro says `No apps connected`
+
+Example:
+
+```text
+INFO  Reloading connected app(s)...
+
+warn No apps connected.
+```
+
+This means Metro is running, but it does not currently detect a React Native app connection.
+
+First check:
+
+```cmd
+adb devices
+```
+
+The phone should show:
+
+```text
+PHONE_IP:5555    device
+```
+
+Then make sure the application is actually running on the phone.
+
+If necessary, launch it manually:
+
+```cmd
+adb -s PHONE_IP:5555 shell am start -n com.reactnativetest1/.MainActivity
+```
+
+---
+
+### Problem 8 — Browser works but React Native still cannot load Metro
+
+If opening:
+
+```text
+http://PC_IP:8081
+```
+
+on the phone shows the Metro page, that proves the phone can reach the computer over the network.
+
+For example, if the PC's Wi-Fi IPv4 address is:
+
+```text
+192.168.1.14
+```
+
+the phone can try:
+
+```text
+http://192.168.1.14:8081
+```
+
+If this opens successfully:
+
+Phone can reach the PC
+Port `8081` is reachable
+Metro is running
+
+If React Native still shows:
+
+```text
+Unable to load script
+```
+
+then investigate the React Native/ADB connection configuration rather than assuming the router is blocking Metro.
+
+---
+
+## Problem 9 — Wi-Fi/router prevents Metro access
+
+If the phone **cannot open**:
+
+```text
+http://PC_IP:8081
+```
+
+check:
+
+### A. Same network
+
+The phone and PC should normally be connected to the same LAN.
+
+Example:
+
+```text
+PC:    192.168.1.14
+Phone: 192.168.1.15
+```
+
+Both are on:
+
+```text
+192.168.1.x
+```
+
+with:
+
+```text
+Subnet mask: 255.255.255.0
+```
+
+### B. Windows Firewall
+
+Windows Firewall can prevent other devices from accessing Metro.
+
+Make sure Node.js/Metro is allowed through the Windows Firewall, or allow the required connection when Windows asks.
+
+### C. Router client isolation
+
+Some routers have features such as:
+
+* AP Isolation
+* Client Isolation
+* Wireless Isolation
+
+These can prevent devices connected to the same Wi-Fi from communicating with each other.
+
+If the phone and PC cannot communicate directly, check the router settings.
+
+---
+
+## Problem 10 — Manually install APK to separate the problems
+
+This is one of the most useful troubleshooting techniques.
+
+Build the APK:
+
+```bash
+bunx react-native run-android
+```
+
+If the command fails specifically at:
+
+```text
+:app:installDebug
+```
+
+try installing the generated APK manually:
+
+```cmd
+adb install -r "D:\Projects\ReactNativeTest1\android\app\build\outputs\apk\debug\app-debug.apk"
+```
+
+### If manual installation succeeds
+
+The APK itself is valid and installation works.
+
+Focus on:
+
+* React Native CLI
+* Gradle install task
+* ADB device selection
+* ADB connection
+* `adb reverse`
+
+### If manual installation fails
+
+Read the exact ADB error.
+
+For example:
+
+```text
+not enough space
+```
+
+→ Free phone storage.
+
+```text
+device offline
+```
+
+→ Fix ADB connection.
+
+```text
+INSTALL_FAILED_...
+```
+
+→ Investigate the specific Android package/install error.
+
+---
+
+# APK Installation Troubleshooting Flow
+
+```text
+                 START
+                   ↓
+          Gradle builds APK?
+                   ↓
+                 YES
+                   ↓
+          :app:installDebug
+                   ↓
+        ┌──────────┴──────────┐
+        ↓                     ↓
+   Installation          Installation
+     succeeds               fails
+        ↓                     ↓
+    App starts?          Read exact error
+        ↓                     ↓
+       YES           ┌───────┼────────┐
+        ↓            ↓       ↓        ↓
+  Metro problem    EOF   No space   Offline
+        ↓            ↓       ↓        ↓
+   Check Metro    ADB     Free      Fix ADB
+   / port 8081   issue   storage   connection
+```
+
+---
+
+# Important Diagnostic Rule
+
+Do not treat every `run-android` failure as a build failure.
+
+There are three separate stages:
+
+```text
+React Native
+     ↓
+Gradle builds APK
+     ↓
+APK installation
+     ↓
+App launches
+     ↓
+Metro connection
+```
+
+For example:
+
+```text
+BUILD SUCCESSFUL
+```
+
+followed by:
+
+```text
+Unable to install app
+```
+
+means the **build succeeded** but installation failed.
+
+Likewise:
+
+```text
+BUILD SUCCESSFUL
+```
+
+and:
+
+```text
+App launches
+```
+
+followed by:
+
+```text
+Unable to load script
+```
+
+means the APK installation succeeded and the problem is now **Metro connectivity**, not APK installation.
+
+---
+
+## Quick Commands
+
+### Check connected devices
+
+```cmd
+adb devices -l
+```
+
+### Restart ADB
+
+```cmd
+adb kill-server
+adb start-server
+```
+
+### Install APK manually
+
+```cmd
+adb install -r "D:\Projects\ReactNativeTest1\android\app\build\outputs\apk\debug\app-debug.apk"
+```
+
+### Check phone storage
+
+```cmd
+adb shell df -h /data
+```
+
+### Set up Metro reverse
+
+```cmd
+adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081
+```
+
+### Start the application manually
+
+```cmd
+adb -s PHONE_IP:5555 shell am start -n com.reactnativetest1/.MainActivity
+```
+
+---
+
+> **Most important rule:** Always read the **actual error at the bottom of the installation step**. Warnings such as Gradle deprecation messages are usually unrelated to an APK installation failure. In the previous troubleshooting case, the real installation problem was **insufficient internal storage on the Vivo**, not Gradle or React Native.
