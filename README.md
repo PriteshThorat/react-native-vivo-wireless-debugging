@@ -579,3 +579,422 @@ Before moving to React Native:
 - No unexpected extra devices/emulators are connected
 
 Once all of these are working, ADB wireless debugging is ready for React Native.
+
+## 3. React Native SDK Problems
+
+This section covers common Android SDK-related problems that can prevent a React Native project from building or installing.
+
+---
+
+### Problem 1 — `SDK location not found`
+
+Example:
+
+```text
+SDK location not found. Define a valid SDK location
+with an ANDROID_HOME environment variable or by setting
+the sdk.dir path in your project's local properties file.
+````
+
+This means Gradle cannot find the Android SDK.
+
+#### Check the Android SDK location
+
+On a typical Windows installation, the Android SDK is located at:
+
+```text
+C:\Users\Admin\AppData\Local\Android\Sdk
+```
+
+You can verify it from:
+
+**Android Studio → Settings → Languages & Frameworks → Android SDK**
+
+---
+
+### Solution A — Create `local.properties`
+
+Inside your React Native project, open:
+
+```text
+android/local.properties
+```
+
+If the file does not exist, create it.
+
+Add:
+
+```properties
+sdk.dir=C:/Users/Admin/AppData/Local/Android/Sdk
+```
+
+> **Important:** On Windows, using `/` instead of `\` avoids many path-escaping problems.
+
+Then clean the project:
+
+```cmd
+cd android
+gradlew clean
+cd ..
+```
+
+Run React Native again:
+
+```bash
+npx react-native run-android
+```
+
+---
+
+### Problem 2 — Incorrect Windows path in `local.properties`
+
+A common mistake is:
+
+```properties
+sdk.dir=C:\Users\Admin\AppData\Local\Android\Sdk
+```
+
+This can cause errors such as:
+
+```text
+The filename, directory name, or volume label syntax is incorrect.
+```
+
+Use:
+
+```properties
+sdk.dir=C:/Users/Admin/AppData/Local/Android/Sdk
+```
+
+instead.
+
+Alternatively, escape the backslashes:
+
+```properties
+sdk.dir=C:\\Users\\Admin\\AppData\\Local\\Android\\Sdk
+```
+
+The first format is generally simpler:
+
+```properties
+sdk.dir=C:/Users/Admin/AppData/Local/Android/Sdk
+```
+
+---
+
+### Problem 3 — Android SDK components are missing
+
+Even if Gradle can find the SDK, the project may fail because required SDK components are not installed.
+
+For example:
+
+```text
+Failed to find Build Tools revision ...
+```
+
+or:
+
+```text
+Failed to install the following Android SDK packages
+```
+
+Open:
+
+**Android Studio → SDK Manager**
+
+Check that the required components are installed.
+
+Common components include:
+
+* Android SDK Platform
+* Android SDK Build-Tools
+* Android SDK Platform-Tools
+* Android SDK Command-line Tools
+* Android SDK Tools required by the project
+
+> The exact Android API level and Build Tools version required depends on your React Native project's Gradle configuration.
+
+After installing the required components, try:
+
+```bash
+npx react-native run-android
+```
+
+---
+
+### Problem 4 — Check whether ADB is installed correctly
+
+ADB is included in Android SDK Platform-Tools.
+
+Run:
+
+```cmd
+adb version
+```
+
+Example:
+
+```text
+Android Debug Bridge version 1.0.41
+Version 36.0.0-13206524
+```
+
+Check where Windows is finding ADB:
+
+```cmd
+where adb
+```
+
+Example:
+
+```text
+C:\Users\Admin\AppData\Local\Android\Sdk\platform-tools\adb.exe
+```
+
+If `adb` is not recognized, add the Android SDK `platform-tools` directory to your Windows `PATH`.
+
+Typical path:
+
+```text
+C:\Users\Admin\AppData\Local\Android\Sdk\platform-tools
+```
+
+After changing `PATH`, open a new terminal and run:
+
+```cmd
+adb version
+```
+
+---
+
+### Problem 5 — Check the Java version
+
+React Native's Android build system also depends on Java.
+
+Check the installed version:
+
+```cmd
+java -version
+```
+
+For the environment used while creating this guide:
+
+```text
+java version "17.0.18"
+```
+
+You can also check:
+
+```cmd
+echo %JAVA_HOME%
+```
+
+If Gradle reports Java-related errors, verify that `JAVA_HOME` points to the intended JDK installation.
+
+> **Important:** Do not blindly change Java versions just because a different version is mentioned online. Use the Java version supported by your specific React Native/Android Gradle Plugin setup.
+
+---
+
+### Problem 6 — Clean the Android build
+
+If the SDK configuration has been corrected but Gradle still behaves as if the old configuration is being used, clean the Android project:
+
+```cmd
+cd android
+gradlew clean
+cd ..
+```
+
+Then run:
+
+```bash
+npx react-native run-android
+```
+
+If you use the Gradle wrapper directly from the Android directory, the command is:
+
+```cmd
+gradlew clean
+```
+
+---
+
+### Problem 7 — `react-native doctor`
+
+React Native provides a diagnostic command that can detect common development-environment problems.
+
+Run:
+
+```bash
+npx react-native doctor
+```
+
+Depending on the project/package-manager setup, you may also use:
+
+```bash
+bunx react-native doctor
+```
+
+The doctor command can help identify problems with:
+
+* Android SDK
+* Android SDK tools
+* JDK
+* Android Studio
+* Environment variables
+* Connected Android devices
+
+Follow the specific recommendations reported by the command rather than changing unrelated configuration.
+
+---
+
+## Verify the Complete Android Environment
+
+Before troubleshooting the React Native application itself, verify:
+
+### 1. Java
+
+```cmd
+java -version
+```
+
+### 2. ADB
+
+```cmd
+adb version
+```
+
+### 3. Android SDK
+
+Check:
+
+```text
+android/local.properties
+```
+
+and make sure it contains the correct SDK path:
+
+```properties
+sdk.dir=C:/Users/Admin/AppData/Local/Android/Sdk
+```
+
+### 4. Connected device
+
+```cmd
+adb devices
+```
+
+Expected:
+
+```text
+List of devices attached
+PHONE_IP:5555    device
+```
+
+### 5. React Native environment
+
+```bash
+npx react-native doctor
+```
+
+---
+
+## Recommended Recovery Sequence
+
+If the project suddenly starts reporting SDK-related errors:
+
+```cmd
+cd android
+gradlew clean
+cd ..
+```
+
+Then verify:
+
+```cmd
+java -version
+adb version
+adb devices
+```
+
+Check:
+
+```text
+android/local.properties
+```
+
+Make sure the SDK path is correct:
+
+```properties
+sdk.dir=C:/Users/Admin/AppData/Local/Android/Sdk
+```
+
+Then run:
+
+```bash
+npx react-native run-android
+```
+
+---
+
+## Important: Don't Confuse SDK Errors with ADB Errors
+
+These are different problems.
+
+### SDK/build problem
+
+Examples:
+
+```text
+SDK location not found
+```
+
+```text
+Failed to find Build Tools
+```
+
+```text
+Could not determine the dependencies
+```
+
+Investigate:
+
+**Android SDK / Gradle / Java / project configuration**
+
+### ADB/device problem
+
+Examples:
+
+```text
+offline
+```
+
+```text
+cannot connect to PHONE_IP:5555
+```
+
+```text
+more than one device/emulator
+```
+
+Investigate:
+
+**ADB / USB / Wi-Fi / connected devices**
+
+### APK installation problem
+
+Examples:
+
+```text
+InstallException: EOF
+```
+
+```text
+Requested internal only, but not enough space
+```
+
+Investigate:
+
+**Phone storage / APK installation / device communication**
+
+> **Most important rule:** If Gradle successfully builds the APK and reaches `installDebug`, the Android SDK/build process has already progressed far enough. Read the installation error before changing SDK configuration.
