@@ -1668,3 +1668,680 @@ adb -s PHONE_IP:5555 shell am start -n com.reactnativetest1/.MainActivity
 ---
 
 > **Most important rule:** Always read the **actual error at the bottom of the installation step**. Warnings such as Gradle deprecation messages are usually unrelated to an APK installation failure. In the previous troubleshooting case, the real installation problem was **insufficient internal storage on the Vivo**, not Gradle or React Native.
+
+## 5. Metro and Port 8081 Problems
+
+React Native uses **Metro** as its JavaScript bundler during development.
+
+By default, Metro runs on:
+
+```text
+http://localhost:8081
+
+When using a physical Android device, the phone must be able to communicate with Metro on the computer.
+
+
+---
+
+Problem 1 — Metro is not running
+
+Example:
+
+Unable to load script.
+
+Make sure Metro is running or that your device can
+connect to the development server.
+
+Start Metro manually:
+
+bunx react-native start
+
+You should see something similar to:
+
+Welcome to Metro v0.84.4
+
+INFO  Dev server ready.
+
+Keep this terminal open.
+
+Then run the application from another terminal:
+
+bunx react-native run-android
+
+
+---
+
+Problem 2 — Metro is running but says No apps connected
+
+Example:
+
+INFO  Reloading connected app(s)...
+
+warn No apps connected.
+Sending "reload" to all React Native apps failed.
+
+This does not necessarily mean Metro is broken.
+
+It means Metro currently does not have a React Native application connected to it.
+
+First check:
+
+adb devices
+
+Expected:
+
+List of devices attached
+192.168.1.15:5555    device
+
+Then make sure the React Native app is actually running on the phone.
+
+
+---
+
+Problem 3 — Unable to load script
+
+Example:
+
+Unable to load script.
+
+If you're using USB on a physical device, make sure you
+also run this command:
+
+adb reverse tcp:8081 tcp:8081
+
+This means the application cannot reach Metro.
+
+There are two common ways to solve this:
+
+1. ADB reverse
+
+
+2. Connect directly to the PC's IP address
+
+
+
+
+---
+
+Method A — ADB Reverse
+
+For a USB-connected device:
+
+adb reverse tcp:8081 tcp:8081
+
+For a specific device:
+
+adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081
+
+Example:
+
+adb -s 192.168.1.15:5555 reverse tcp:8081 tcp:8081
+
+Check the reverse configuration:
+
+adb -s 192.168.1.15:5555 reverse --list
+
+Expected output should contain:
+
+tcp:8081 tcp:8081
+
+> If adb reverse works, the phone does not need to access the PC's 192.168.x.x:8081 address directly. ADB forwards the phone's port 8081 to the computer's port 8081.
+
+
+
+
+---
+
+Method B — Connect Directly Using the PC IP
+
+This is particularly useful when using wireless ADB.
+
+Find the PC's IPv4 address:
+
+ipconfig
+
+Example:
+
+Wireless LAN adapter Wi-Fi:
+
+   IPv4 Address. . . . . . . : 192.168.1.14
+   Subnet Mask . . . . . . . : 255.255.255.0
+
+In this example:
+
+PC IP = 192.168.1.14
+
+Do not use the phone's IP.
+
+For example:
+
+Phone = 192.168.1.15
+PC    = 192.168.1.14
+
+The phone should connect to:
+
+192.168.1.14:8081
+
+
+---
+
+Problem 4 — Which IP should be used?
+
+This is an easy mistake to make.
+
+Suppose:
+
+Phone:
+192.168.1.15
+
+and:
+
+PC:
+192.168.1.14
+
+Then:
+
+ADB connection
+
+You connect to the phone's IP:
+
+adb connect 192.168.1.15:5555
+
+Metro connection
+
+The phone connects to the PC's IP:
+
+192.168.1.14:8081
+
+So remember:
+
+ADB:
+PC → Phone
+     ↓
+192.168.1.15:5555
+
+Metro:
+Phone → PC
+     ↓
+192.168.1.14:8081
+
+
+---
+
+Problem 5 — Test whether the phone can reach Metro
+
+First make sure Metro is running:
+
+bunx react-native start
+
+Then find the PC's Wi-Fi IPv4 address:
+
+ipconfig
+
+For example:
+
+192.168.1.14
+
+On the Vivo phone, open the browser and enter:
+
+http://192.168.1.14:8081
+
+If Metro is accessible, you should see a Metro-related response/page instead of:
+
+This site can't be reached
+
+If the page opens
+
+This proves:
+
+✅ Phone can reach the PC
+
+✅ PC is reachable over the local network
+
+✅ Metro is running
+
+✅ Port 8081 is reachable
+
+
+If React Native still says Unable to load script, investigate the React Native server configuration or ADB connection.
+
+If the page does not open
+
+Investigate:
+
+Windows Firewall
+
+Router restrictions
+
+Wi-Fi isolation
+
+Whether Metro is actually running
+
+Whether the PC and phone are on the same network
+
+Whether the PC IP address is correct
+
+
+
+---
+
+Problem 6 — Windows Firewall blocks port 8081
+
+If the phone cannot open:
+
+http://PC_IP:8081
+
+Windows Firewall may be blocking incoming connections.
+
+Check whether Windows displayed a firewall prompt when Metro/Node.js was first started.
+
+If necessary, allow Node.js through Windows Defender Firewall for the appropriate network profile.
+
+You can also check whether something is listening on port 8081:
+
+netstat -ano | findstr :8081
+
+Example:
+
+TCP    0.0.0.0:8081    0.0.0.0:0    LISTENING    12345
+
+LISTENING indicates that a process is listening on port 8081.
+
+
+---
+
+Problem 7 — Port 8081 is already in use
+
+Example:
+
+Error: listen EADDRINUSE: address already in use :::8081
+
+This means another process is already using port 8081.
+
+Find the process:
+
+netstat -ano | findstr :8081
+
+Example:
+
+TCP    0.0.0.0:8081    0.0.0.0:0    LISTENING    12345
+
+The last number is the PID:
+
+12345
+
+Find the process:
+
+tasklist | findstr 12345
+
+If it is an old Metro/Node process that you no longer need, you can terminate it:
+
+taskkill /PID 12345 /F
+
+Then start Metro again:
+
+bunx react-native start
+
+> Do not terminate a process unless you know what it is.
+
+
+
+
+---
+
+Problem 8 — Use another Metro port
+
+If port 8081 cannot be used, Metro can run on another port.
+
+For example:
+
+bunx react-native start --port 8082
+
+Now Metro runs on:
+
+http://localhost:8082
+
+The application must also be configured to use the same port.
+
+For example, with ADB reverse:
+
+adb reverse tcp:8082 tcp:8082
+
+Then run the React Native application using the corresponding Metro port.
+
+> Changing the Metro port is usually unnecessary unless port 8081 is occupied or there is another specific reason to use a different port.
+
+
+
+
+---
+
+Problem 9 — adb reverse says more than one device/emulator
+
+Example:
+
+adb.exe: error: more than one device/emulator
+
+First check:
+
+adb devices -l
+
+If multiple devices are listed:
+
+List of devices attached
+emulator-5554          device
+192.168.1.15:5555      device
+
+specify the phone:
+
+adb -s 192.168.1.15:5555 reverse tcp:8081 tcp:8081
+
+If only one device appears but ADB still reports:
+
+more than one device/emulator
+
+check for multiple ADB installations:
+
+where adb
+
+Example:
+
+C:\Users\Admin\AppData\Local\Android\Sdk\platform-tools\adb.exe
+C:\scrcpy-win64-v3.3.3\adb.exe
+
+Also check:
+
+tasklist | findstr /i "adb scrcpy"
+
+If necessary:
+
+adb kill-server
+adb start-server
+adb devices -l
+
+
+---
+
+Problem 10 — adb reverse succeeds but Metro still doesn't work
+
+If:
+
+adb reverse tcp:8081 tcp:8081
+
+succeeds, check that Metro is running:
+
+bunx react-native start
+
+Then restart the application.
+
+You can also verify the reverse rule:
+
+adb reverse --list
+
+Expected:
+
+tcp:8081 tcp:8081
+
+If the reverse rule exists but the app still cannot load JavaScript, investigate whether:
+
+Metro is running
+
+The app is a debug build
+
+The correct Metro port is being used
+
+A stale application instance is running
+
+ADB is connected to the correct device
+
+
+
+---
+
+Problem 11 — Phone browser says This site can't be reached
+
+If the phone shows:
+
+This site can't be reached
+
+when opening:
+
+http://PC_IP:8081
+
+check the following in order.
+
+1. Check Metro
+
+bunx react-native start
+
+2. Check PC IP
+
+ipconfig
+
+Use the Wi-Fi IPv4 address of the PC.
+
+Example:
+
+PC = 192.168.1.14
+
+3. Check phone IP
+
+Your phone's IP should normally be on the same local network.
+
+Example:
+
+PC    = 192.168.1.14
+Phone = 192.168.1.15
+
+4. Check port 8081 on the PC
+
+netstat -ano | findstr :8081
+
+5. Check Windows Firewall
+
+Make sure incoming connections to Metro/Node.js are not being blocked.
+
+6. Check router isolation
+
+Some routers prevent Wi-Fi clients from communicating with each other.
+
+Look for settings such as:
+
+AP Isolation
+Client Isolation
+Wireless Isolation
+
+
+---
+
+Problem 12 — Airtel router/network restrictions
+
+If both devices are connected to the same Airtel router but:
+
+Phone → http://PC_IP:8081
+
+does not work, the router may be preventing communication between wireless clients.
+
+Before changing router settings, test the simpler possibilities:
+
+Metro running?
+        ↓
+Correct PC IP?
+        ↓
+Port 8081 listening?
+        ↓
+Windows Firewall?
+        ↓
+Same Wi-Fi network?
+        ↓
+Router client isolation?
+
+If the browser can open Metro successfully, the router is not blocking that connection.
+
+
+---
+
+Problem 13 — Metro starts but the app still uses an old server
+
+If Metro is running on a different port or the app has stale configuration, restart Metro and the application.
+
+Stop Metro:
+
+Ctrl + C
+
+Start it again:
+
+bunx react-native start
+
+Then restart the app:
+
+bunx react-native run-android
+
+For wireless ADB, verify the device first:
+
+adb devices
+
+
+---
+
+🔥 Quick Metro Troubleshooting Flow
+
+START
+                  ↓
+           Is Metro running?
+             ↓          ↓
+            NO          YES
+             ↓           ↓
+     bunx react-native   Check device
+          start          connection
+                          ↓
+                    adb devices
+                          ↓
+                  Device = device?
+                    ↓          ↓
+                   NO         YES
+                    ↓          ↓
+              Fix ADB       App launches?
+                               ↓
+                         ┌─────┴─────┐
+                         ↓           ↓
+                        NO          YES
+                         ↓           ↓
+                   Check APK       Unable to
+                   installation    load script
+                                     ↓
+                              Check port 8081
+                                     ↓
+                           ┌─────────┴─────────┐
+                           ↓                   ↓
+                     adb reverse          Direct Wi-Fi
+                           ↓                   ↓
+                    tcp:8081              PC_IP:8081
+                           ↓                   ↓
+                       Works?             Browser test
+                           ↓                   ↓
+                          YES                 FAIL
+                           ↓                   ↓
+                       Metro OK       Firewall/router/
+                                      network problem
+
+
+---
+
+🧠 Most Important IP Rule
+
+For wireless React Native development, there are two different IP addresses to remember.
+
+Suppose:
+
+PC Wi-Fi IPv4:
+192.168.1.14
+
+Vivo Wi-Fi IPv4:
+192.168.1.15
+
+ADB
+
+Use the phone IP:
+
+adb connect 192.168.1.15:5555
+
+Metro direct connection
+
+Use the PC IP:
+
+http://192.168.1.14:8081
+
+Never confuse:
+
+Phone IP  → ADB
+PC IP     → Metro
+
+
+---
+
+🧠 Important Diagnostic Rule
+
+Separate these three problems:
+
+ADB problem
+
+adb connect
+adb devices
+adb reverse
+
+APK installation problem
+
+adb install
+:app:installDebug
+InstallException
+
+Metro problem
+
+Unable to load script
+No apps connected
+Port 8081
+Metro
+
+Fix the problem belonging to the stage that actually failed.
+
+
+---
+
+✅ Quick Commands
+
+Start Metro
+
+bunx react-native start
+
+Check port 8081
+
+netstat -ano | findstr :8081
+
+Check ADB devices
+
+adb devices -l
+
+ADB reverse
+
+adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081
+
+Check reverse rules
+
+adb -s PHONE_IP:5555 reverse --list
+
+Find PC IP
+
+ipconfig
+
+Test Metro from phone
+
+Open:
+
+http://PC_IP:8081
+
+Run React Native
+
+bunx react-native run-android
+
+> Most important rule: If the APK installs and launches but shows Unable to load script, stop troubleshooting APK installation. The next thing to investigate is Metro and port 8081 connectivity.
