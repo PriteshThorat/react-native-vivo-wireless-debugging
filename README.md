@@ -2923,3 +2923,421 @@ Unable to load script
 ```
 
 → Don't troubleshoot Gradle or APK installation anymore. Focus on **Metro and port 8081**.
+
+# Important Commands
+
+These are the most useful commands for React Native + Vivo 1724 wireless debugging.
+
+---
+
+## ADB Device Commands
+
+### Check connected devices
+
+```cmd
+adb devices
+````
+
+More detailed information:
+
+```cmd
+adb devices -l
+```
+
+Expected:
+
+```text
+192.168.1.15:5555    device product:1724 model:vivo_1724 device:1724
+```
+
+---
+
+### Check ADB version
+
+```cmd
+adb version
+```
+
+---
+
+### Restart ADB
+
+Useful when the device is `offline` or ADB behaves unexpectedly.
+
+```cmd
+adb kill-server
+adb start-server
+adb devices
+```
+
+---
+
+## USB ADB → Wireless ADB
+
+### Enable ADB TCP mode
+
+Connect the phone through USB first:
+
+```cmd
+adb tcpip 5555
+```
+
+Expected:
+
+```text
+restarting in TCP mode port: 5555
+```
+
+---
+
+### Find the phone's Wi-Fi IP
+
+```cmd
+adb shell ip addr show wlan0
+```
+
+Look for:
+
+```text
+inet 192.168.x.x
+```
+
+---
+
+### Connect to the phone wirelessly
+
+Replace `PHONE_IP` with the phone's current IP address:
+
+```cmd
+adb connect PHONE_IP:5555
+```
+
+Example:
+
+```cmd
+adb connect 192.168.1.15:5555
+```
+
+---
+
+### Disconnect a wireless device
+
+```cmd
+adb disconnect PHONE_IP:5555
+```
+
+Example:
+
+```cmd
+adb disconnect 192.168.1.15:5555
+```
+
+---
+
+## ADB Reverse for Metro
+
+### Forward Metro port to the phone
+
+```cmd
+adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081
+```
+
+Example:
+
+```cmd
+adb -s 192.168.1.15:5555 reverse tcp:8081 tcp:8081
+```
+
+---
+
+### Check reverse connections
+
+```cmd
+adb -s PHONE_IP:5555 reverse --list
+```
+
+Expected:
+
+```text
+tcp:8081 tcp:8081
+```
+
+---
+
+### Remove the reverse connection
+
+```cmd
+adb -s PHONE_IP:5555 reverse --remove tcp:8081
+```
+
+---
+
+### Remove all reverse connections
+
+```cmd
+adb -s PHONE_IP:5555 reverse --remove-all
+```
+
+---
+
+## APK Commands
+
+### Install an APK manually
+
+```cmd
+adb install -r "PATH_TO_APP_DEBUG_APK.apk"
+```
+
+Example:
+
+```cmd
+adb install -r "D:\Projects\ReactNativeTest1\android\app\build\outputs\apk\debug\app-debug.apk"
+```
+
+Expected:
+
+```text
+Performing Streamed Install
+Success
+```
+
+---
+
+### Launch the React Native app
+
+Replace the package/activity with your application's values:
+
+```cmd
+adb -s PHONE_IP:5555 shell am start -n PACKAGE_NAME/.MainActivity
+```
+
+Example:
+
+```cmd
+adb -s 192.168.1.15:5555 shell am start -n com.reactnativetest1/.MainActivity
+```
+
+---
+
+## Metro Commands
+
+### Start Metro
+
+```bash
+npx react-native start
+```
+
+---
+
+### Start Metro and clear cache
+
+```bash
+npx react-native start --reset-cache
+```
+
+---
+
+### Run React Native on Android
+
+```bash
+npx react-native run-android
+```
+
+---
+
+### Run with verbose output
+
+```bash
+npx react-native run-android --verbose
+```
+
+---
+
+## Network Commands
+
+### Find the PC's IP address
+
+Windows:
+
+```cmd
+ipconfig
+```
+
+Look under the active Wi-Fi adapter for:
+
+```text
+IPv4 Address
+```
+
+Example:
+
+```text
+IPv4 Address. . . . . . . . . . . : 192.168.1.14
+```
+
+---
+
+### Check whether Metro is listening on port 8081
+
+```cmd
+netstat -ano | findstr :8081
+```
+
+If Metro is running, you should see a listening entry such as:
+
+```text
+TCP    0.0.0.0:8081    0.0.0.0:0    LISTENING
+```
+
+---
+
+## Device Storage
+
+Check available space on the phone:
+
+```cmd
+adb shell df -h /data
+```
+
+This is especially useful when installation fails with:
+
+```text
+Requested internal only, but not enough space
+```
+
+---
+
+## React Native / Gradle Cleanup
+
+From the project directory:
+
+```cmd
+cd android
+gradlew clean
+cd ..
+```
+
+Then:
+
+```bash
+npx react-native run-android
+```
+
+---
+
+## Check Which ADB Is Being Used
+
+Windows:
+
+```cmd
+where adb
+```
+
+Example:
+
+```text
+C:\Users\Admin\AppData\Local\Android\Sdk\platform-tools\adb.exe
+C:\scrcpy-win64-v3.3.3\adb.exe
+```
+
+If multiple ADB installations exist, explicitly use the Android SDK version:
+
+```cmd
+"C:\Users\Admin\AppData\Local\Android\Sdk\platform-tools\adb.exe" devices
+```
+
+---
+
+# Most Important Commands
+
+If you don't want to remember everything, remember these:
+
+### 1. Check device
+
+```cmd
+adb devices -l
+```
+
+### 2. Enable wireless ADB
+
+```cmd
+adb tcpip 5555
+```
+
+### 3. Find phone IP
+
+```cmd
+adb shell ip addr show wlan0
+```
+
+### 4. Connect wirelessly
+
+```cmd
+adb connect PHONE_IP:5555
+```
+
+### 5. Check PC IP
+
+```cmd
+ipconfig
+```
+
+### 6. Start Metro
+
+```bash
+npx react-native start
+```
+
+### 7. Reverse Metro port
+
+```cmd
+adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081
+```
+
+### 8. Run the app
+
+```bash
+npx react-native run-android
+```
+
+### 9. Manually install APK
+
+```cmd
+adb install -r "PATH_TO_APP_DEBUG_APK.apk"
+```
+
+### 10. Check Metro port
+
+```cmd
+netstat -ano | findstr :8081
+```
+
+---
+
+## Important
+
+Do **not** permanently use an old IP such as:
+
+```text
+192.168.1.15
+```
+
+Your phone's IP can change when it reconnects to Wi-Fi.
+
+Always check the current IP when `adb connect` fails:
+
+```cmd
+adb shell ip addr show wlan0
+```
+
+Also, if multiple Android devices/emulators are connected, specify the device using:
+
+```cmd
+adb -s PHONE_IP:5555 COMMAND
+```
+
+Example:
+
+```cmd
+adb -s 192.168.1.15:5555 reverse tcp:8081 tcp:8081
+```
