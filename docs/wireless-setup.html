@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>First-Time Wireless ADB Setup - React Native + Vivo Debugging</title>
+  <meta name="description" content="Step-by-step guide for connecting the Vivo 1724 to a Windows PC using ADB over Wi-Fi TCP/IP mode for React Native wireless debugging.">
+  <meta name="keywords" content="ADB wireless setup, TCP/IP mode, Vivo 1724, React Native, adb tcpip 5555, adb connect">
+  <link rel="canonical" href="https://priteshthorat.github.io/react-native-vivo-wireless-debugging/wireless-setup.html">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <header class="mobile-header">
+      <button class="mobile-menu-btn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="mobile-header-title">RN + Vivo Debugging</span>
+    </header>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>RN + Vivo Debugging</h1>
+        <div class="sidebar-subtitle">Troubleshooting Guide</div>
+      </div>
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" placeholder="Search docs..." aria-label="Search documentation">
+        </div>
+        <div class="search-results"></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-section-title">Getting Started</span>
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="wireless-setup.html" class="nav-link">Wireless ADB Setup</a>
+        </div>
+        <div class="nav-section">
+          <span class="nav-section-title">Troubleshooting</span>
+          <a href="adb-connection.html" class="nav-link">ADB Connection Problems</a>
+          <a href="sdk-problems.html" class="nav-link">SDK Problems</a>
+          <a href="apk-installation.html" class="nav-link">APK Installation</a>
+          <a href="metro-problems.html" class="nav-link">Metro &amp; Port 8081</a>
+        </div>
+        <div class="nav-section">
+          <span class="nav-section-title">Reference</span>
+          <a href="troubleshooting.html" class="nav-link">Troubleshooting Flow</a>
+          <a href="commands.html" class="nav-link">Important Commands</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="theme-toggle" aria-label="Toggle theme">
+          <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <span class="theme-label">Dark mode</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <article class="content">
+        <h1>First-Time Wireless ADB Setup</h1>
+        <p class="subtitle">This section explains how to connect the Vivo 1724 to a Windows PC using ADB over Wi-Fi (TCP/IP).</p>
+
+        <div class="callout callout-info">
+          <div class="callout-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Important
+          </div>
+          <p>This method is intended for older Android devices that do not have the newer <strong>Wireless Debugging / Pairing</strong> option.</p>
+        </div>
+
+        <h2>Step 1 &mdash; Enable Developer Options</h2>
+
+        <p>On the Vivo phone, open:</p>
+
+        <p><strong>Settings &rarr; More settings &rarr; Developer options</strong></p>
+
+        <p>Enable:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>USB debugging</code></pre>
+        </div>
+
+        <p>If Developer options is not visible:<br>
+        <strong>Settings &rarr; About phone &rarr; Software version / Build number</strong></p>
+
+        <p>Tap the Build number repeatedly until Developer Options are enabled.</p>
+
+        <h2>Step 2 &mdash; Connect the Phone Using USB</h2>
+
+        <p>Connect the Vivo phone to your PC using a USB cable.</p>
+
+        <p>Check whether ADB detects the device:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>adb devices</code></pre>
+        </div>
+
+        <p>Expected:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>List of devices attached
+b4t543re    device</code></pre>
+        </div>
+
+        <p>If the device appears as:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>b4t543re    offline</code></pre>
+        </div>
+
+        <p>ADB is not communicating properly with the phone. Try:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>adb kill-server
+adb start-server
+adb devices</code></pre>
+        </div>
+
+        <p>Then reconnect the USB cable.</p>
+
+        <p>On the phone, you may see:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>Allow USB debugging?</code></pre>
+        </div>
+
+        <p>Tap <strong>Allow</strong>.</p>
+
+        <p>You should eventually get:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>b4t543re    device</code></pre>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Warning
+          </div>
+          <p>Do not continue until the device shows <code>device</code>, not <code>offline</code>.</p>
+        </div>
+
+        <h2>Step 3 &mdash; Enable ADB TCP/IP Mode</h2>
+
+        <p>Keep the phone connected through USB and run:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>adb tcpip 5555</code></pre>
+        </div>
+
+        <p>Expected:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>restarting in TCP mode port: 5555</code></pre>
+        </div>
+
+        <p>This changes ADB from USB communication to TCP/IP communication over the local network.</p>
+
+        <h2>Step 4 &mdash; Find the Phone's Current IP Address</h2>
+
+        <p>While USB is still connected, run:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>adb shell ip addr show wlan0</code></pre>
+        </div>
+
+        <p>Look for a line similar to:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>inet 192.168.1.x/24</code></pre>
+        </div>
+
+        <p>For example:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>inet 192.168.1.15/24</code></pre>
+        </div>
+
+        <p>The <code>192.168.1.15</code> address is only an example. Use your phone's current IP address.</p>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Important
+          </div>
+          <p>Do not permanently use <code>192.168.1.15</code>. The phone's local IP can change when reconnecting to Wi-Fi.</p>
+        </div>
+
+        <h2>Step 5 &mdash; Disconnect the USB Cable</h2>
+
+        <p>Once TCP/IP mode has been enabled and you know the phone's IP address, disconnect the USB cable.</p>
+
+        <p>Make sure:</p>
+        <ul>
+          <li>The PC is connected to Wi-Fi.</li>
+          <li>The Vivo is connected to the same local network.</li>
+          <li>The phone remains powered on.</li>
+          <li>USB debugging remains enabled.</li>
+        </ul>
+
+        <h2>Step 6 &mdash; Connect to the Phone Wirelessly</h2>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>adb connect PHONE_IP:5555</code></pre>
+        </div>
+
+        <p>For example:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>adb connect 192.168.1.15:5555</code></pre>
+        </div>
+
+        <p>Expected:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>connected to 192.168.1.15:5555</code></pre>
+        </div>
+
+        <h2>Step 7 &mdash; Verify the Wireless Connection</h2>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>adb devices</code></pre>
+        </div>
+
+        <p>Expected:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>List of devices attached
+192.168.1.15:5555    device</code></pre>
+        </div>
+
+        <p>The important part is <code>device</code>. If you see <code>offline</code>, the wireless ADB connection is not working correctly.</p>
+
+        <h2>Step 8 &mdash; Run React Native</h2>
+
+        <p>Once the device appears as <code>device</code>, go to your React Native project:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>cd C:\MyProject\ReactNativeProject
+npx react-native run-android</code></pre>
+        </div>
+
+        <p>React Native should detect the connected Vivo device and install the debug APK.</p>
+
+        <h2>Successful Setup</h2>
+
+        <p>The complete process is:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>Enable USB debugging
+        |
+Connect USB
+        |
+adb devices
+        |
+device
+        |
+adb tcpip 5555
+        |
+Find phone IP
+        |
+Disconnect USB
+        |
+adb connect PHONE_IP:5555
+        |
+adb devices
+        |
+PHONE_IP:5555    device
+        |
+npx react-native run-android</code></pre>
+        </div>
+
+        <h2>Commands to Remember</h2>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>adb devices
+adb tcpip 5555
+adb shell ip addr show wlan0
+adb connect PHONE_IP:5555
+adb devices
+npx react-native run-android</code></pre>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            Tip
+          </div>
+          <p>You normally only need the USB connection for the initial <code>adb tcpip 5555</code> setup. After that, you can use ADB wirelessly as long as the phone and PC can communicate over the same network.</p>
+        </div>
+
+        <nav class="page-nav">
+          <a href="index.html">
+            <div class="page-nav-label">Previous</div>
+            <div class="page-nav-title">&larr; Home</div>
+          </a>
+          <a href="adb-connection.html" class="next">
+            <div class="page-nav-label">Next</div>
+            <div class="page-nav-title">ADB Connection Problems &rarr;</div>
+          </a>
+        </nav>
+      </article>
+    </main>
+  </div>
+
+  <script src="js/search-index.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

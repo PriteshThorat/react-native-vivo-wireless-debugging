@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>APK Installation Problems — RN + Vivo Debugging Guide</title>
+  <meta name="description" content="APK installation problems and solutions for React Native Vivo wireless debugging. InstallException EOF, insufficient storage, manual installation, and diagnostic techniques.">
+  <meta name="keywords" content="APK installation, InstallException, EOF, React Native, Vivo, wireless debugging, adb install">
+  <link rel="canonical" href="https://priteshthorat.github.io/react-native-vivo-wireless-debugging/apk-installation.html">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="mobile-header">
+      <button class="mobile-menu-btn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="mobile-header-title">RN + Vivo Debugging</span>
+    </header>
+    <div class="sidebar-overlay"></div>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>RN + Vivo Debugging</h1>
+    <div class="sidebar-subtitle">Troubleshooting Guide</div>
+  </div>
+  <div class="search-container">
+    <div class="search-input-wrapper">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" placeholder="Search docs..." aria-label="Search documentation">
+    </div>
+    <div class="search-results"></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <span class="nav-section-title">Getting Started</span>
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="wireless-setup.html" class="nav-link">Wireless ADB Setup</a>
+    </div>
+    <div class="nav-section">
+      <span class="nav-section-title">Troubleshooting</span>
+      <a href="adb-connection.html" class="nav-link">ADB Connection Problems</a>
+      <a href="sdk-problems.html" class="nav-link">SDK Problems</a>
+      <a href="apk-installation.html" class="nav-link active">APK Installation</a>
+      <a href="metro-problems.html" class="nav-link">Metro &amp; Port 8081</a>
+    </div>
+    <div class="nav-section">
+      <span class="nav-section-title">Reference</span>
+      <a href="troubleshooting.html" class="nav-link">Troubleshooting Flow</a>
+      <a href="commands.html" class="nav-link">Important Commands</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="theme-toggle" aria-label="Toggle theme">
+      <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <span class="theme-label">Dark mode</span>
+    </button>
+  </div>
+</aside>
+
+<main class="main-content">
+  <article class="content">
+  <div class="content-inner">
+    <h1>APK Installation Problems</h1>
+
+    <p>This section covers problems that occur <strong>after Gradle successfully builds the APK</strong>, but React Native fails while installing it on the Android device.</p>
+
+    <!-- Problem 1 -->
+    <h2>Problem 1 — <code>InstallException: EOF</code></h2>
+
+    <p>Example:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>&gt; Task :app:installDebug FAILED
+
+[Device]: Error during Sync: EOF
+
+com.android.ddmlib.InstallException: EOF
+
+Caused by: java.io.EOFException: EOF
+at com.android.ddmlib.SyncService.doPushFile(...)</code></pre>
+    </div>
+
+    <p>This means the APK was built successfully, but ADB failed while transferring/installing the APK on the device.</p>
+
+    <p>The important part is:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>Error during Sync: EOF</code></pre>
+    </div>
+    <p>and:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>SyncService.doPushFile</code></pre>
+    </div>
+
+    <p>This is usually an <strong>ADB/device communication or device-side installation problem</strong>, not a React Native JavaScript problem.</p>
+
+    <h3>Step 1 — Check whether the device is still connected</h3>
+
+    <p>Run:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb devices</code></pre>
+    </div>
+    <p>Expected:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>List of devices attached
+192.168.x.x:5555    device</code></pre>
+    </div>
+
+    <p>If it shows <code>offline</code>, restart ADB:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb kill-server
+adb start-server
+adb devices</code></pre>
+    </div>
+
+    <p>If using wireless ADB, reconnect:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb connect PHONE_IP:5555</code></pre>
+    </div>
+
+    <h3>Step 2 — Try installing the APK manually</h3>
+
+    <p>First make sure the APK exists:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>android/app/build/outputs/apk/debug/app-debug.apk</code></pre>
+    </div>
+
+    <p>Then install it manually:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb install -r "C:\<YourProject>\android\app\build\outputs\apk\debug\app-debug.apk"</code></pre>
+    </div>
+
+    <p>If it succeeds:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>Performing Streamed Install
+Success</code></pre>
+    </div>
+    <p>then:</p>
+    <ul>
+      <li>APK was built correctly</li>
+      <li>Android SDK is working</li>
+      <li>ADB can communicate with the phone</li>
+      <li>APK installation itself works</li>
+    </ul>
+
+    <p>This is a very useful diagnostic test.</p>
+
+    <!-- Problem 2 -->
+    <h2>Problem 2 — <code>Requested internal only, but not enough space</code></h2>
+
+    <p>Example:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>Requested internal only, but not enough space</code></pre>
+    </div>
+
+    <p>This means the phone does not have enough <strong>internal storage</strong> to install the APK.</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        Note
+      </div>
+      <p>It is generally <strong>not</strong> a React Native code problem, Gradle problem, Android SDK problem, Metro problem, or Wi-Fi problem.</p>
+    </div>
+
+    <h3>Check phone storage</h3>
+
+    <p>You can use:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb shell df -h /data</code></pre>
+    </div>
+
+    <p>If the available space is very low, free storage on the phone. Remove or move:</p>
+    <ul>
+      <li>Large videos</li>
+      <li>Downloads</li>
+      <li>WhatsApp media</li>
+      <li>Unused applications</li>
+      <li>Old APK files</li>
+      <li>Other large files</li>
+    </ul>
+
+    <p>Then try:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">bash</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>npx react-native run-android</code></pre>
+    </div>
+
+    <!-- Problem 3 -->
+    <h2>Problem 3 — Installation works manually but <code>run-android</code> fails</h2>
+
+    <p>Sometimes this works:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb install -r "C:\<YourProject>\android\app\build\outputs\apk\debug\app-debug.apk"</code></pre>
+    </div>
+    <p>but:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">bash</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>npx react-native run-android</code></pre>
+    </div>
+    <p>fails during installation.</p>
+
+    <p>If manual installation succeeds, check the ADB connection used by React Native/Gradle.</p>
+
+    <p>Run:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb devices -l</code></pre>
+    </div>
+
+    <p>Then verify the exact device serial. Example:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>192.168.1.15:5555    device</code></pre>
+    </div>
+
+    <p>You can also start the application manually:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb -s 192.168.1.15:5555 shell am start -n com.yourapp/.MainActivity</code></pre>
+    </div>
+
+    <p>If the app opens, the APK installation is working.</p>
+
+    <!-- Problem 4 -->
+    <h2>Problem 4 — <code>more than one device/emulator</code></h2>
+
+    <p>Example:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb.exe: error: more than one device/emulator</code></pre>
+    </div>
+
+    <p>This happens when ADB sees multiple devices/emulators.</p>
+
+    <p>Check:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb devices -l</code></pre>
+    </div>
+
+    <p>Example:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>List of devices attached
+emulator-5554          device
+192.168.1.15:5555      device</code></pre>
+    </div>
+
+    <p>Specify the device explicitly:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb -s 192.168.1.15:5555 install -r "C:\<YourProject>\android\app\build\outputs\apk\debug\app-debug.apk"</code></pre>
+    </div>
+
+    <p>For other ADB commands:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb -s 192.168.1.15:5555 shell</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb -s 192.168.1.15:5555 reverse tcp:8081 tcp:8081</code></pre>
+    </div>
+
+    <div class="callout callout-important">
+      <div class="callout-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Important
+      </div>
+      <p>If <code>adb devices -l</code> shows only one device but ADB still reports <code>more than one device/emulator</code>, do <strong>not</strong> immediately assume that there are actually two phones. Check for multiple ADB installations/processes.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>where adb</code></pre>
+    </div>
+
+    <p>For example:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>C:\Users\<USERNAME>\AppData\Local\Android\Sdk\platform-tools\adb.exe
+C:\scrcpy-win64-v3.3.3\adb.exe</code></pre>
+    </div>
+
+    <p>Also check:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>tasklist | findstr /i "adb scrcpy"</code></pre>
+    </div>
+
+    <p>If necessary, close applications using ADB, such as:</p>
+    <ul>
+      <li>Android Studio</li>
+      <li>scrcpy</li>
+      <li>VS Code terminals running ADB commands</li>
+      <li>Other Android debugging tools</li>
+    </ul>
+
+    <p>Then restart ADB:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb kill-server
+adb start-server
+adb devices -l</code></pre>
+    </div>
+
+    <!-- Problem 5 -->
+    <h2>Problem 5 — <code>adb reverse</code> fails</h2>
+
+    <p>React Native normally uses port <code>8081</code> for Metro.</p>
+
+    <p>For a USB-connected device, you can use:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb reverse tcp:8081 tcp:8081</code></pre>
+    </div>
+
+    <p>For a wireless device:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081</code></pre>
+    </div>
+
+    <p>Example:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb -s 192.168.1.15:5555 reverse tcp:8081 tcp:8081</code></pre>
+    </div>
+
+    <p>If you receive:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb.exe: error: more than one device/emulator</code></pre>
+    </div>
+    <p>check:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb devices -l</code></pre>
+    </div>
+    <p>and investigate multiple ADB connections/processes.</p>
+
+    <!-- Problem 6 -->
+    <h2>Problem 6 — App installs but shows <code>Unable to load script</code></h2>
+
+    <p>Example:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>Unable to load script.
+
+If you're using USB on a physical device, make sure you
+also run this command:
+
+adb reverse tcp:8081 tcp:8081</code></pre>
+    </div>
+
+    <p>This means the APK was installed and launched, but the React Native application cannot reach the <strong>Metro development server</strong>.</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        Note
+      </div>
+      <p>This is different from an APK installation failure.</p>
+    </div>
+
+    <p>First check that Metro is running:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>Welcome to Metro v0.84.4
+
+INFO  Dev server ready.</code></pre>
+    </div>
+
+    <p>Then check:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb devices</code></pre>
+    </div>
+
+    <p>If the device is connected, try:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081</code></pre>
+    </div>
+
+    <!-- Problem 7 -->
+    <h2>Problem 7 — Metro says <code>No apps connected</code></h2>
+
+    <p>Example:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>INFO  Reloading connected app(s)...
+
+warn No apps connected.</code></pre>
+    </div>
+
+    <p>This means Metro is running, but it does not currently detect a React Native app connection.</p>
+
+    <p>First check:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb devices</code></pre>
+    </div>
+
+    <p>The phone should show:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>PHONE_IP:5555    device</code></pre>
+    </div>
+
+    <p>Then make sure the application is actually running on the phone.</p>
+
+    <p>If necessary, launch it manually:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb -s PHONE_IP:5555 shell am start -n com.yourapp/.MainActivity</code></pre>
+    </div>
+
+    <!-- Problem 8 -->
+    <h2>Problem 8 — Browser works but React Native still cannot load Metro</h2>
+
+    <p>If opening <code>http://PC_IP:8081</code> on the phone shows the Metro page, that proves the phone can reach the computer over the network.</p>
+
+    <p>For example, if the PC's Wi-Fi IPv4 address is <code>192.168.1.14</code>, the phone can try:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>http://192.168.1.14:8081</code></pre>
+    </div>
+
+    <p>If this opens successfully:</p>
+    <ul>
+      <li>Phone can reach the PC</li>
+      <li>Port <code>8081</code> is reachable</li>
+      <li>Metro is running</li>
+    </ul>
+
+    <p>If React Native still shows <code>Unable to load script</code>, then investigate the React Native/ADB connection configuration rather than assuming the router is blocking Metro.</p>
+
+    <!-- Problem 9 -->
+    <h2>Problem 9 — Wi-Fi/router prevents Metro access</h2>
+
+    <p>If the phone <strong>cannot open</strong> <code>http://PC_IP:8081</code>, check:</p>
+
+    <h3>A. Same network</h3>
+    <p>The phone and PC should normally be connected to the same LAN. Example:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>PC:    192.168.1.14
+Phone: 192.168.1.15</code></pre>
+    </div>
+    <p>Both are on <code>192.168.1.x</code> with subnet mask <code>255.255.255.0</code>.</p>
+
+    <h3>B. Windows Firewall</h3>
+    <p>Windows Firewall can prevent other devices from accessing Metro. Make sure Node.js/Metro is allowed through the Windows Firewall, or allow the required connection when Windows asks.</p>
+
+    <h3>C. Router client isolation</h3>
+    <p>Some routers have features such as:</p>
+    <ul>
+      <li>AP Isolation</li>
+      <li>Client Isolation</li>
+      <li>Wireless Isolation</li>
+    </ul>
+
+    <p>These can prevent devices connected to the same Wi-Fi from communicating with each other. If the phone and PC cannot communicate directly, check the router settings.</p>
+
+    <!-- Problem 10 -->
+    <h2>Problem 10 — Manually install APK to separate the problems</h2>
+
+    <p>This is one of the most useful troubleshooting techniques.</p>
+
+    <p>Build the APK:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">bash</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>npx react-native run-android</code></pre>
+    </div>
+
+    <p>If the command fails specifically at <code>:app:installDebug</code>, try installing the generated APK manually:</p>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb install -r "C:\<YourProject>\android\app\build\outputs\apk\debug\app-debug.apk"</code></pre>
+    </div>
+
+    <h3>If manual installation succeeds</h3>
+    <p>The APK itself is valid and installation works. Focus on:</p>
+    <ul>
+      <li>React Native CLI</li>
+      <li>Gradle install task</li>
+      <li>ADB device selection</li>
+      <li>ADB connection</li>
+      <li><code>adb reverse</code></li>
+    </ul>
+
+    <h3>If manual installation fails</h3>
+    <p>Read the exact ADB error. For example:</p>
+    <ul>
+      <li><code>not enough space</code> → Free phone storage.</li>
+      <li><code>device offline</code> → Fix ADB connection.</li>
+      <li><code>INSTALL_FAILED_...</code> → Investigate the specific Android package/install error.</li>
+    </ul>
+
+    <!-- Troubleshooting Flow -->
+    <h2>APK Installation Troubleshooting Flow</h2>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>                 START
+                   |
+          Gradle builds APK?
+                   |
+                 YES
+                   |
+          :app:installDebug
+                   |
+        +----------+----------+
+        |                     |
+   Installation          Installation
+     succeeds               fails
+        |                     |
+    App starts?          Read exact error
+        |                     |
+       YES           +-------+--------+
+        |            |       |        |
+   Metro problem    EOF   No space   Offline
+        |            |       |        |
+   Check Metro    ADB     Free      Fix ADB
+   / port 8081   issue   storage   connection</code></pre>
+    </div>
+
+    <!-- Important Diagnostic Rule -->
+    <h2>Important Diagnostic Rule</h2>
+
+    <p>Do not treat every <code>run-android</code> failure as a build failure. There are three separate stages:</p>
+
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">text</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>React Native
+     |
+Gradle builds APK
+     |
+APK installation
+     |
+App launches
+     |
+Metro connection</code></pre>
+    </div>
+
+    <p>For example, <code>BUILD SUCCESSFUL</code> followed by <code>Unable to install app</code> means the <strong>build succeeded</strong> but installation failed.</p>
+
+    <p>Likewise, <code>BUILD SUCCESSFUL</code> and <code>App launches</code> followed by <code>Unable to load script</code> means the APK installation succeeded and the problem is now <strong>Metro connectivity</strong>, not APK installation.</p>
+
+    <!-- Quick Commands -->
+    <h2>Quick Commands (APK)</h2>
+
+    <h3>Check connected devices</h3>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb devices -l</code></pre>
+    </div>
+
+    <h3>Restart ADB</h3>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb kill-server
+adb start-server</code></pre>
+    </div>
+
+    <h3>Install APK manually</h3>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb install -r "C:\<YourProject>\android\app\build\outputs\apk\debug\app-debug.apk"</code></pre>
+    </div>
+
+    <h3>Check phone storage</h3>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb shell df -h /data</code></pre>
+    </div>
+
+    <h3>Set up Metro reverse</h3>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081</code></pre>
+    </div>
+
+    <h3>Start the application manually</h3>
+    <div class="code-block">
+      <div class="code-block-header">
+        <span class="code-block-lang">cmd</span>
+        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+      </div>
+      <pre><code>adb -s PHONE_IP:5555 shell am start -n com.yourapp/.MainActivity</code></pre>
+    </div>
+
+    <div class="callout callout-important">
+      <div class="callout-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Important
+      </div>
+      <p><strong>Most important rule:</strong> Always read the <strong>actual error at the bottom of the installation step</strong>. Warnings such as Gradle deprecation messages are usually unrelated to an APK installation failure. In the previous troubleshooting case, the real installation problem was <strong>insufficient internal storage on the Vivo</strong>, not Gradle or React Native.</p>
+    </div>
+
+    <!-- Page Navigation -->
+    <div class="page-nav">
+      <a href="sdk-problems.html" class="page-nav-prev">
+        <span class="page-nav-label">Previous</span>
+        <span class="page-nav-title">SDK Problems</span>
+      </a>
+      <a href="metro-problems.html" class="page-nav-next">
+        <span class="page-nav-label">Next</span>
+        <span class="page-nav-title">Metro &amp; Port 8081</span>
+      </a>
+    </div>
+
+  </div>
+  </article>
+</main>
+</div>
+
+<script src="js/search-index.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

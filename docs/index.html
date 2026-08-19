@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>React Native + Vivo Wireless Debugging Guide</title>
+  <meta name="description" content="A practical troubleshooting guide for running React Native applications on a physical Vivo 1724 device using wireless ADB over Wi-Fi on Windows 10.">
+  <meta name="keywords" content="React Native, Vivo 1724, wireless debugging, ADB, Android, troubleshooting, TCP/IP">
+  <meta name="author" content="Pritesh Thorat">
+  <link rel="canonical" href="https://priteshthorat.github.io/react-native-vivo-wireless-debugging/">
+  <link rel="stylesheet" href="css/style.css">
+  <link href="public/react-native.png">
+</head>
+<body>
+  <div class="layout">
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+      <button class="mobile-menu-btn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="mobile-header-title">RN + Vivo Debugging</span>
+    </header>
+    <div class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>RN + Vivo Debugging</h1>
+        <div class="sidebar-subtitle">Troubleshooting Guide</div>
+      </div>
+
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" placeholder="Search docs..." aria-label="Search documentation">
+        </div>
+        <div class="search-results"></div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-section-title">Getting Started</span>
+          <a href="index.html" class="nav-link active">Home</a>
+          <a href="wireless-setup.html" class="nav-link">Wireless ADB Setup</a>
+        </div>
+        <div class="nav-section">
+          <span class="nav-section-title">Troubleshooting</span>
+          <a href="adb-connection.html" class="nav-link">ADB Connection Problems</a>
+          <a href="sdk-problems.html" class="nav-link">SDK Problems</a>
+          <a href="apk-installation.html" class="nav-link">APK Installation</a>
+          <a href="metro-problems.html" class="nav-link">Metro &amp; Port 8081</a>
+        </div>
+        <div class="nav-section">
+          <span class="nav-section-title">Reference</span>
+          <a href="troubleshooting.html" class="nav-link">Troubleshooting Flow</a>
+          <a href="commands.html" class="nav-link">Important Commands</a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="theme-toggle" aria-label="Toggle theme">
+          <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <span class="theme-label">Dark mode</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <article class="content">
+        <div class="home-hero">
+          <h1>React Native + Vivo 1724<br>Wireless Debugging Guide</h1>
+          <p class="subtitle">A practical troubleshooting guide for running React Native applications on a physical Vivo device using wireless ADB.</p>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Note
+          </div>
+          <p>This guide is based on a Vivo 1724 running Android 8.1.0. Commands and settings may differ on newer Android/Vivo devices.</p>
+        </div>
+
+        <h2>Device Information</h2>
+
+        <table class="device-table">
+          <thead>
+            <tr><th>Component</th><th>Details</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Device</td><td>Vivo 1724</td></tr>
+            <tr><td>Android Version</td><td>Android 8.1.0</td></tr>
+            <tr><td>Debugging Method</td><td>ADB over Wi-Fi (TCP/IP)</td></tr>
+            <tr><td>ADB Port</td><td><code>5555</code></td></tr>
+            <tr><td>Operating System</td><td>Windows 10</td></tr>
+            <tr><td>Framework</td><td>React Native</td></tr>
+            <tr><td>Metro</td><td><code>0.84.4</code></td></tr>
+            <tr><td>Java</td><td><code>17.0.18</code></td></tr>
+            <tr><td>ADB</td><td><code>36.0.0-13206524</code></td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Important
+          </div>
+          <p>This device uses an older Android version and does <strong>not</strong> provide the newer Android Wireless Debugging / pairing workflow found on modern Android versions. This guide uses the traditional ADB TCP/IP method:</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span class="copy-label">Copy</span>
+            </button>
+          </div>
+          <pre><code>adb tcpip 5555
+adb connect PHONE_IP:5555</code></pre>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            Tip
+          </div>
+          <p>The phone's IP address may change depending on the Wi-Fi network. Do not assume that <code>192.168.1.15</code> will always be the correct IP address.</p>
+        </div>
+
+        <p>I recommend keeping the <strong>exact ADB, Java, Metro, and OS versions</strong> because they make the guide more reproducible for someone debugging the same type of setup.</p>
+
+        <h2>What This Guide Covers</h2>
+
+        <div class="home-features">
+          <a href="wireless-setup.html" class="home-feature">
+            <div class="home-feature-title">Wireless ADB Setup</div>
+            <div class="home-feature-desc">Step-by-step instructions for connecting the Vivo 1724 to a Windows PC over Wi-Fi using ADB TCP/IP mode.</div>
+          </a>
+          <a href="adb-connection.html" class="home-feature">
+            <div class="home-feature-title">ADB Connection Problems</div>
+            <div class="home-feature-desc">Error 10060, offline status, no device, multiple devices, ADB reverse failures, and more.</div>
+          </a>
+          <a href="sdk-problems.html" class="home-feature">
+            <div class="home-feature-title">SDK Problems</div>
+            <div class="home-feature-desc">SDK location not found, incorrect paths, missing components, Java version issues, and Gradle cleanup.</div>
+          </a>
+          <a href="apk-installation.html" class="home-feature">
+            <div class="home-feature-title">APK Installation</div>
+            <div class="home-feature-desc">InstallException: EOF, insufficient storage, manual installation, and diagnostic techniques.</div>
+          </a>
+          <a href="metro-problems.html" class="home-feature">
+            <div class="home-feature-title">Metro &amp; Port 8081</div>
+            <div class="home-feature-desc">Metro not running, port conflicts, Windows Firewall, router isolation, and IP address confusion.</div>
+          </a>
+          <a href="troubleshooting.html" class="home-feature">
+            <div class="home-feature-title">Troubleshooting Flow</div>
+            <div class="home-feature-desc">Decision trees and stage identification to quickly isolate the root cause.</div>
+          </a>
+        </div>
+
+        <h2>Quick Start</h2>
+
+        <p>If you already have USB debugging enabled and ADB installed, the essential commands are:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span class="copy-label">Copy</span>
+            </button>
+          </div>
+          <pre><code>adb devices
+adb tcpip 5555
+adb shell ip addr show wlan0
+adb connect PHONE_IP:5555
+adb devices
+npx react-native run-android</code></pre>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            Tip
+          </div>
+          <p>You normally only need the USB connection for the initial <code>adb tcpip 5555</code> setup. After that, you can use ADB wirelessly as long as the phone and PC can communicate over the same network.</p>
+        </div>
+
+        <nav class="page-nav">
+          <div></div>
+          <a href="wireless-setup.html" class="next">
+            <div class="page-nav-label">Next</div>
+            <div class="page-nav-title">Wireless ADB Setup &rarr;</div>
+          </a>
+        </nav>
+      </article>
+    </main>
+  </div>
+
+  <script src="js/search-index.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

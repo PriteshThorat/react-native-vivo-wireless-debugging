@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Metro &amp; Port 8081 Problems — RN + Vivo Debugging Guide</title>
+  <meta name="description" content="Troubleshoot Metro bundler and port 8081 connectivity problems when using React Native with Vivo wireless debugging. Solutions for unable to load script, port conflicts, firewall blocking, and more.">
+  <meta name="keywords" content="Metro, port 8081, React Native, Vivo, wireless debugging, adb reverse, bundler, development server">
+  <link rel="canonical" href="https://priteshthorat.github.io/react-native-vivo-wireless-debugging/metro-problems.html">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="mobile-header">
+      <button class="mobile-menu-btn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="mobile-header-title">RN + Vivo Debugging</span>
+    </header>
+    <div class="sidebar-overlay"></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>RN + Vivo Debugging</h1>
+        <div class="sidebar-subtitle">Troubleshooting Guide</div>
+      </div>
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" placeholder="Search docs..." aria-label="Search documentation">
+        </div>
+        <div class="search-results"></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-section-title">Getting Started</span>
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="wireless-setup.html" class="nav-link">Wireless ADB Setup</a>
+        </div>
+        <div class="nav-section">
+          <span class="nav-section-title">Troubleshooting</span>
+          <a href="adb-connection.html" class="nav-link">ADB Connection Problems</a>
+          <a href="sdk-problems.html" class="nav-link">SDK Problems</a>
+          <a href="apk-installation.html" class="nav-link">APK Installation</a>
+          <a href="metro-problems.html" class="nav-link active">Metro &amp; Port 8081</a>
+        </div>
+        <div class="nav-section">
+          <span class="nav-section-title">Reference</span>
+          <a href="troubleshooting.html" class="nav-link">Troubleshooting Flow</a>
+          <a href="commands.html" class="nav-link">Important Commands</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="theme-toggle" aria-label="Toggle theme">
+          <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <span class="theme-label">Dark mode</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <article class="content">
+      <h1>Metro and Port 8081 Problems</h1>
+      <p>React Native uses <strong>Metro</strong> as its JavaScript bundler during development. By default, Metro runs on <code>http://localhost:8081</code>. When using a physical Android device, the phone must be able to communicate with Metro on the computer.</p>
+
+      <h2>Problem 1 &mdash; Metro is not running</h2>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Unable to load script.
+
+Make sure Metro is running or that your device can
+connect to the development server.</code></pre>
+      </div>
+
+      <p>Start Metro manually:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>npx react-native start</code></pre>
+      </div>
+
+      <p>You should see something similar to:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Welcome to Metro v0.84.4
+
+INFO  Dev server ready.</code></pre>
+      </div>
+
+      <p>Keep this terminal open. Then run the application from another terminal:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>npx react-native run-android</code></pre>
+      </div>
+
+      <h2>Problem 2 &mdash; Metro is running but says <code>No apps connected</code></h2>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>INFO  Reloading connected app(s)...
+
+warn No apps connected.
+Sending "reload" to all React Native apps failed.</code></pre>
+      </div>
+
+      <p>This does <strong>not necessarily mean Metro is broken</strong>. It means Metro currently does not have a React Native application connected to it.</p>
+
+      <p>First check:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb devices</code></pre>
+      </div>
+
+      <p>Expected:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>List of devices attached
+192.168.1.15:5555    device</code></pre>
+      </div>
+
+      <p>Then make sure the React Native app is actually running on the phone.</p>
+
+      <h2>Problem 3 &mdash; <code>Unable to load script</code></h2>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Unable to load script.
+
+If you're using USB on a physical device, make sure you
+also run this command:
+
+adb reverse tcp:8081 tcp:8081</code></pre>
+      </div>
+
+      <p>This means the application cannot reach Metro. There are two common ways to solve this:</p>
+      <ol>
+        <li><strong>ADB reverse</strong></li>
+        <li><strong>Connect directly to the PC's IP address</strong></li>
+      </ol>
+
+      <h3>Method A &mdash; ADB Reverse</h3>
+
+      <p>For a USB-connected device:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb reverse tcp:8081 tcp:8081</code></pre>
+      </div>
+
+      <p>For a specific device:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081</code></pre>
+      </div>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb -s 192.168.1.15:5555 reverse tcp:8081 tcp:8081</code></pre>
+      </div>
+
+      <p>Check the reverse configuration:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb -s 192.168.1.15:5555 reverse --list</code></pre>
+      </div>
+
+      <p>Expected output should contain:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>tcp:8081 tcp:8081</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Note
+        </div>
+        <p>If <code>adb reverse</code> works, the phone does not need to access the PC's <code>192.168.x.x:8081</code> address directly. ADB forwards the phone's port 8081 to the computer's port 8081.</p>
+      </div>
+
+      <h3>Method B &mdash; Connect Directly Using the PC IP</h3>
+
+      <p>This is particularly useful when using <strong>wireless ADB</strong>.</p>
+
+      <p>Find the PC's IPv4 address:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>ipconfig</code></pre>
+      </div>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Wireless LAN adapter Wi-Fi:
+
+   IPv4 Address. . . . . . . : 192.168.1.14
+   Subnet Mask . . . . . . . : 255.255.255.0</code></pre>
+      </div>
+
+      <p>In this example: <code>PC IP = 192.168.1.14</code></p>
+
+      <p>Do <strong>not</strong> use the phone's IP. The phone should connect to <code>192.168.1.14:8081</code>.</p>
+
+      <h2>Problem 4 &mdash; Which IP should be used?</h2>
+
+      <p>This is an easy mistake to make.</p>
+
+      <p>Suppose:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Phone: 192.168.1.15
+PC:    192.168.1.14</code></pre>
+      </div>
+
+      <h3>ADB connection</h3>
+      <p>You connect <strong>to the phone's IP</strong>:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb connect 192.168.1.15:5555</code></pre>
+      </div>
+
+      <h3>Metro connection</h3>
+      <p>The phone connects <strong>to the PC's IP</strong>:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>192.168.1.14:8081</code></pre>
+      </div>
+
+      <p>So remember:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>ADB:
+PC -> Phone
+     |
+192.168.1.15:5555
+
+Metro:
+Phone -> PC
+     |
+192.168.1.14:8081</code></pre>
+      </div>
+
+      <h2>Problem 5 &mdash; Test whether the phone can reach Metro</h2>
+
+      <p>First make sure Metro is running:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>npx react-native start</code></pre>
+      </div>
+
+      <p>Then find the PC's Wi-Fi IPv4 address:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>ipconfig</code></pre>
+      </div>
+
+      <p>For example: <code>192.168.1.14</code></p>
+
+      <p>On the Vivo phone, open the browser and enter:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>http://192.168.1.14:8081</code></pre>
+      </div>
+
+      <p>If Metro is accessible, you should see a Metro-related response/page instead of <code>This site can't be reached</code>.</p>
+
+      <h3>If the page opens</h3>
+      <p>This proves:</p>
+      <ul>
+        <li>Phone can reach the PC</li>
+        <li>PC is reachable over the local network</li>
+        <li>Metro is running</li>
+        <li>Port 8081 is reachable</li>
+      </ul>
+
+      <p>If React Native still says <code>Unable to load script</code>, investigate the React Native server configuration or ADB connection.</p>
+
+      <h3>If the page does not open</h3>
+      <p>Investigate:</p>
+      <ul>
+        <li>Windows Firewall</li>
+        <li>Router restrictions</li>
+        <li>Wi-Fi isolation</li>
+        <li>Whether Metro is actually running</li>
+        <li>Whether the PC and phone are on the same network</li>
+        <li>Whether the PC IP address is correct</li>
+      </ul>
+
+      <h2>Problem 6 &mdash; Windows Firewall blocks port 8081</h2>
+
+      <p>If the phone cannot open <code>http://PC_IP:8081</code>, Windows Firewall may be blocking incoming connections.</p>
+
+      <p>Check whether Windows displayed a firewall prompt when Metro/Node.js was first started. If necessary, allow Node.js through Windows Defender Firewall for the appropriate network profile.</p>
+
+      <p>You can also check whether something is listening on port 8081:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>netstat -ano | findstr :8081</code></pre>
+      </div>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>TCP    0.0.0.0:8081    0.0.0.0:0    LISTENING    12345</code></pre>
+      </div>
+
+      <p><code>LISTENING</code> indicates that a process is listening on port 8081.</p>
+
+      <h2>Problem 7 &mdash; Port 8081 is already in use</h2>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Error: listen EADDRINUSE: address already in use :::8081</code></pre>
+      </div>
+
+      <p>Find the process:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>netstat -ano | findstr :8081</code></pre>
+      </div>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>TCP    0.0.0.0:8081    0.0.0.0:0    LISTENING    12345</code></pre>
+      </div>
+
+      <p>The last number is the PID: <code>12345</code></p>
+
+      <p>Find the process:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>tasklist | findstr 12345</code></pre>
+      </div>
+
+      <p>If it is an old Metro/Node process that you no longer need, you can terminate it:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>taskkill /PID 12345 /F</code></pre>
+      </div>
+
+      <p>Then start Metro again:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>npx react-native start</code></pre>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Warning
+        </div>
+        <p>Do not terminate a process unless you know what it is.</p>
+      </div>
+
+      <h2>Problem 8 &mdash; Use another Metro port</h2>
+
+      <p>If port 8081 cannot be used, Metro can run on another port. For example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>npx react-native start --port 8082</code></pre>
+      </div>
+
+      <p>Now Metro runs on <code>http://localhost:8082</code>.</p>
+
+      <p>The application must also be configured to use the same port. For example, with ADB reverse:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb reverse tcp:8082 tcp:8082</code></pre>
+      </div>
+
+      <p>Then run the React Native application using the corresponding Metro port.</p>
+
+      <div class="callout callout-info">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Note
+        </div>
+        <p>Changing the Metro port is usually unnecessary unless port 8081 is occupied or there is another specific reason to use a different port.</p>
+      </div>
+
+      <h2>Problem 9 &mdash; <code>adb reverse</code> says <code>more than one device/emulator</code></h2>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb.exe: error: more than one device/emulator</code></pre>
+      </div>
+
+      <p>First check:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb devices -l</code></pre>
+      </div>
+
+      <p>If multiple devices are listed, specify the phone:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb -s 192.168.1.15:5555 reverse tcp:8081 tcp:8081</code></pre>
+      </div>
+
+      <p>If only one device appears but ADB still reports <code>more than one device/emulator</code>, check for multiple ADB installations:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>where adb</code></pre>
+      </div>
+
+      <p>Also check:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>tasklist | findstr /i "adb scrcpy"</code></pre>
+      </div>
+
+      <p>If necessary:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb kill-server
+adb start-server
+adb devices -l</code></pre>
+      </div>
+
+      <h2>Problem 10 &mdash; <code>adb reverse</code> succeeds but Metro still doesn't work</h2>
+
+      <p>If <code>adb reverse tcp:8081 tcp:8081</code> succeeds, check that Metro is running:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>npx react-native start</code></pre>
+      </div>
+
+      <p>Then restart the application.</p>
+
+      <p>You can also verify the reverse rule:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb reverse --list</code></pre>
+      </div>
+
+      <p>Expected:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>tcp:8081 tcp:8081</code></pre>
+      </div>
+
+      <p>If the reverse rule exists but the app still cannot load JavaScript, investigate whether:</p>
+      <ul>
+        <li>Metro is running</li>
+        <li>The app is a debug build</li>
+        <li>The correct Metro port is being used</li>
+        <li>A stale application instance is running</li>
+        <li>ADB is connected to the correct device</li>
+      </ul>
+
+      <h2>Problem 11 &mdash; Phone browser says <code>This site can't be reached</code></h2>
+
+      <p>If the phone shows <code>This site can't be reached</code> when opening <code>http://PC_IP:8081</code>, check the following in order.</p>
+
+      <p>1. Check Metro:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>npx react-native start</code></pre>
+      </div>
+
+      <p>2. Check PC IP:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>ipconfig</code></pre>
+      </div>
+
+      <p>Use the <strong>Wi-Fi IPv4 address of the PC</strong>. Example: <code>PC = 192.168.1.14</code></p>
+
+      <p>3. Check phone IP. Your phone's IP should normally be on the same local network. Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>PC    = 192.168.1.14
+Phone = 192.168.1.15</code></pre>
+      </div>
+
+      <p>4. Check port 8081 on the PC:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>netstat -ano | findstr :8081</code></pre>
+      </div>
+
+      <p>5. Check Windows Firewall. Make sure incoming connections to Metro/Node.js are not being blocked.</p>
+
+      <p>6. Check router isolation. Some routers prevent Wi-Fi clients from communicating with each other. Look for settings such as:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>AP Isolation
+Client Isolation
+Wireless Isolation</code></pre>
+      </div>
+
+      <h2>Problem 12 &mdash; Airtel router/network restrictions</h2>
+
+      <p>If both devices are connected to the same Airtel router but <code>Phone -> http://PC_IP:8081</code> does not work, the router may be preventing communication between wireless clients.</p>
+
+      <p>Before changing router settings, test the simpler possibilities:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Metro running?
+        |
+Correct PC IP?
+        |
+Port 8081 listening?
+        |
+Windows Firewall?
+        |
+Same Wi-Fi network?
+        |
+Router client isolation?</code></pre>
+      </div>
+
+      <p>If the browser can open Metro successfully, the router is <strong>not blocking that connection</strong>.</p>
+
+      <h2>Problem 13 &mdash; Metro starts but the app still uses an old server</h2>
+
+      <p>If Metro is running on a different port or the app has stale configuration, restart Metro and the application.</p>
+
+      <p>Stop Metro: <code>Ctrl + C</code></p>
+
+      <p>Start it again:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>npx react-native start</code></pre>
+      </div>
+
+      <p>Then restart the app:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>npx react-native run-android</code></pre>
+      </div>
+
+      <p>For wireless ADB, verify the device first:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb devices</code></pre>
+      </div>
+
+      <h2>Quick Metro Troubleshooting Flow</h2>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>                START
+                  |
+           Is Metro running?
+             |          |
+            NO          YES
+             |           |
+     npx react-native   Check device
+          start          connection
+                          |
+                    adb devices
+                          |
+                  Device = device?
+                    |          |
+                   NO         YES
+                    |          |
+              Fix ADB       App launches?
+                               |
+                         +-----+-----+
+                         |           |
+                        NO          YES
+                         |           |
+                   Check APK       Unable to
+                   installation    load script
+                                     |
+                              Check port 8081
+                                     |
+                           +---------+---------+
+                           |                   |
+                     adb reverse          Direct Wi-Fi
+                           |                   |
+                    tcp:8081              PC_IP:8081
+                           |                   |
+                       Works?             Browser test
+                           |                   |
+                          YES                 FAIL
+                           |                   |
+                       Metro OK       Firewall/router/
+                                      network problem</code></pre>
+      </div>
+
+      <h2>Most Important IP Rule</h2>
+
+      <p>For wireless React Native development, there are <strong>two different IP addresses</strong> to remember.</p>
+
+      <p>Suppose:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>PC Wi-Fi IPv4:  192.168.1.14
+Vivo Wi-Fi IPv4: 192.168.1.15</code></pre>
+      </div>
+
+      <h3>ADB</h3>
+      <p>Use the <strong>phone IP</strong>:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb connect 192.168.1.15:5555</code></pre>
+      </div>
+
+      <h3>Metro direct connection</h3>
+      <p>Use the <strong>PC IP</strong>:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>http://192.168.1.14:8081</code></pre>
+      </div>
+
+      <p>Never confuse:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Phone IP  -> ADB
+PC IP     -> Metro</code></pre>
+      </div>
+
+      <h2>Important Diagnostic Rule (Metro)</h2>
+
+      <p>Separate these three problems:</p>
+
+      <h3>ADB problem</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb connect
+adb devices
+adb reverse</code></pre>
+      </div>
+
+      <h3>APK installation problem</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb install
+:app:installDebug
+InstallException</code></pre>
+      </div>
+
+      <h3>Metro problem</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Unable to load script
+No apps connected
+Port 8081
+Metro</code></pre>
+      </div>
+
+      <p>Fix the problem belonging to the stage that actually failed.</p>
+
+      <h2>Quick Commands (Metro)</h2>
+
+      <h3>Start Metro</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>npx react-native start</code></pre>
+      </div>
+
+      <h3>Check port 8081</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>netstat -ano | findstr :8081</code></pre>
+      </div>
+
+      <h3>Check ADB devices</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb devices -l</code></pre>
+      </div>
+
+      <h3>ADB reverse</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081</code></pre>
+      </div>
+
+      <h3>Check reverse rules</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb -s PHONE_IP:5555 reverse --list</code></pre>
+      </div>
+
+      <h3>Find PC IP</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">cmd</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>ipconfig</code></pre>
+      </div>
+
+      <h3>Test Metro from phone</h3>
+      <p>Open: <code>http://PC_IP:8081</code></p>
+
+      <h3>Run React Native</h3>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>npx react-native run-android</code></pre>
+      </div>
+
+      <div class="callout callout-important">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Important
+        </div>
+        <p><strong>Most important rule:</strong> If the APK installs and launches but shows <strong><code>Unable to load script</code></strong>, stop troubleshooting APK installation. The next thing to investigate is <strong>Metro and port 8081 connectivity</strong>.</p>
+      </div>
+
+      <nav class="page-nav">
+        <a href="apk-installation.html">
+          <div class="page-nav-label">Previous</div>
+          <div class="page-nav-title">&larr; APK Installation</div>
+        </a>
+        <a href="troubleshooting.html" class="next">
+          <div class="page-nav-label">Next</div>
+          <div class="page-nav-title">Quick Troubleshooting Flow &rarr;</div>
+        </a>
+      </nav>
+      </article>
+    </main>
+  </div>
+
+  <script src="js/search-index.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

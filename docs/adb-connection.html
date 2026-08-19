@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>ADB Connection Problems — RN + Vivo Debugging Guide</title>
+  <meta name="description" content="Troubleshoot ADB connection problems when using React Native with Vivo wireless debugging. Solutions for error 10060, offline devices, multiple devices, and more.">
+  <meta name="keywords" content="ADB, wireless debugging, React Native, Vivo, adb connect, error 10060, offline, multiple devices">
+  <link rel="canonical" href="https://priteshthorat.github.io/react-native-vivo-wireless-debugging/adb-connection.html">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="mobile-header">
+      <button class="mobile-menu-btn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="mobile-header-title">RN + Vivo Debugging</span>
+    </header>
+    <div class="sidebar-overlay"></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>RN + Vivo Debugging</h1>
+        <div class="sidebar-subtitle">Troubleshooting Guide</div>
+      </div>
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" placeholder="Search docs..." aria-label="Search documentation">
+        </div>
+        <div class="search-results"></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-section-title">Getting Started</span>
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="wireless-setup.html" class="nav-link">Wireless ADB Setup</a>
+        </div>
+        <div class="nav-section">
+          <span class="nav-section-title">Troubleshooting</span>
+          <a href="adb-connection.html" class="nav-link active">ADB Connection Problems</a>
+          <a href="sdk-problems.html" class="nav-link">SDK Problems</a>
+          <a href="apk-installation.html" class="nav-link">APK Installation</a>
+          <a href="metro-problems.html" class="nav-link">Metro &amp; Port 8081</a>
+        </div>
+        <div class="nav-section">
+          <span class="nav-section-title">Reference</span>
+          <a href="troubleshooting.html" class="nav-link">Troubleshooting Flow</a>
+          <a href="commands.html" class="nav-link">Important Commands</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="theme-toggle" aria-label="Toggle theme">
+          <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <span class="theme-label">Dark mode</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <article class="content">
+      <h1>ADB Connection Problems</h1>
+      <p>This section covers common problems when connecting the Vivo device to the PC using ADB.</p>
+
+      <h2>Problem 1 &mdash; <code>adb connect</code> gives Error 10060</h2>
+
+      <p>Example error:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>cannot connect to 192.168.1.15:5555:
+A connection attempt failed because the connected party
+did not properly respond after a period of time.</code></pre>
+      </div>
+
+      <p>This usually means that the PC cannot reach the phone at the specified IP address and port.</p>
+
+      <h3>Check 1 &mdash; Make sure both devices are on the same network</h3>
+      <p>The PC and phone should be connected to the same local network. For example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>PC     → Wi-Fi Router
+Phone  → Wi-Fi Router</code></pre>
+      </div>
+
+      <p>They should normally have addresses in the same subnet, such as:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>PC:    192.168.1.x
+Phone: 192.168.1.x</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Note
+        </div>
+        <p>The exact IP addresses do not have to be identical. Only the network/subnet needs to allow communication between them.</p>
+      </div>
+
+      <h3>Check 2 &mdash; Find the phone's current IP</h3>
+      <p>Connect the phone through USB and run:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb shell ip addr show wlan0</code></pre>
+      </div>
+
+      <p>Look for:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>inet 192.168.1.x/24</code></pre>
+      </div>
+
+      <p>Then use that IP:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb connect PHONE_IP:5555</code></pre>
+      </div>
+
+      <p>For example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb connect 192.168.1.15:5555</code></pre>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Warning
+        </div>
+        <p>Do not assume that <code>192.168.1.15</code> is always the phone's IP. The address can change when the phone reconnects to Wi-Fi.</p>
+      </div>
+
+      <h3>Check 3 &mdash; Restart ADB TCP/IP mode</h3>
+      <p>With USB connected:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb tcpip 5555</code></pre>
+      </div>
+
+      <p>Expected:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>restarting in TCP mode port: 5555</code></pre>
+      </div>
+
+      <p>Then disconnect USB and try:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb connect PHONE_IP:5555</code></pre>
+      </div>
+
+      <h2>Problem 2 &mdash; <code>adb devices</code> shows <code>offline</code></h2>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>List of devices attached
+b4t543re    offline</code></pre>
+      </div>
+
+      <p>This means ADB can see the device but cannot communicate with it correctly.</p>
+
+      <p>Try restarting the ADB server:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb kill-server
+adb start-server
+adb devices</code></pre>
+      </div>
+
+      <p>If it still shows <code>offline</code>:</p>
+      <ol>
+        <li>Disconnect the USB cable.</li>
+        <li>Turn USB debugging off.</li>
+        <li>Turn USB debugging back on.</li>
+        <li>Reconnect the USB cable.</li>
+        <li>Accept the <strong>Allow USB debugging?</strong> prompt on the phone.</li>
+        <li>Run:</li>
+      </ol>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb devices</code></pre>
+      </div>
+
+      <p>Expected:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>List of devices attached
+b4t543re    device</code></pre>
+      </div>
+
+      <div class="callout callout-important">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Important
+        </div>
+        <p>Do not continue to wireless setup until the USB device shows <code>device</code> instead of <code>offline</code>.</p>
+      </div>
+
+      <h2>Problem 3 &mdash; <code>adb devices</code> shows no device</h2>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>List of devices attached</code></pre>
+      </div>
+
+      <p>with nothing underneath it.</p>
+
+      <p>Check the following:</p>
+      <ul>
+        <li>USB cable is properly connected.</li>
+        <li>USB debugging is enabled.</li>
+        <li>Phone is unlocked.</li>
+        <li>USB debugging authorization was accepted.</li>
+        <li>Try another USB port.</li>
+        <li>Try another USB cable.</li>
+        <li>Restart the ADB server.</li>
+      </ul>
+
+      <p>Run:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb kill-server
+adb start-server
+adb devices</code></pre>
+      </div>
+
+      <p>If the phone asks:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Allow USB debugging?</code></pre>
+      </div>
+
+      <p>tap <strong>Allow</strong>.</p>
+
+      <h2>Problem 4 &mdash; <code>adb</code> says <code>more than one device/emulator</code></h2>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb.exe: error: more than one device/emulator</code></pre>
+      </div>
+
+      <p>This can happen when ADB detects multiple devices, emulators, or stale ADB connections.</p>
+
+      <p>First check:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb devices -l</code></pre>
+      </div>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>List of devices attached
+192.168.1.15:5555    device
+emulator-5554        device</code></pre>
+      </div>
+
+      <p>If multiple devices are listed, specify the target device:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb -s DEVICE_SERIAL shell</code></pre>
+      </div>
+
+      <p>For example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb -s 192.168.1.15:5555 shell</code></pre>
+      </div>
+
+      <div class="callout callout-important">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Important
+        </div>
+        <p>If <code>adb devices -l</code> shows only one device but ADB still reports <code>more than one device/emulator</code>, this may indicate an ADB-server or toolchain issue rather than an actual second device. Restarting the ADB server is a good first step:</p>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb kill-server
+adb start-server
+adb devices -l</code></pre>
+      </div>
+
+      <h2>Problem 5 &mdash; Multiple <code>adb.exe</code> installations</h2>
+
+      <p>Check which ADB executables are available:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>where adb</code></pre>
+      </div>
+
+      <p>You may see something like:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>C:\Users\<USERNAME>\AppData\Local\Android\Sdk\platform-tools\adb.exe
+C:\scrcpy-win64-v3.3.3\adb.exe</code></pre>
+      </div>
+
+      <p>Multiple copies of ADB can sometimes make troubleshooting confusing.</p>
+
+      <p>Check the version of the Android SDK ADB:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>"C:\Users\<USERNAME>\AppData\Local\Android\Sdk\platform-tools\adb.exe" version</code></pre>
+      </div>
+
+      <p>Example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Android Debug Bridge version 1.0.41
+Version 36.0.0-13206524</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Tip
+        </div>
+        <p>If you have multiple ADB installations, preferably use the ADB from <code>Android SDK → platform-tools</code>.</p>
+      </div>
+
+      <p>You can also check which ADB server is currently running:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>tasklist | findstr /i "adb"</code></pre>
+      </div>
+
+      <p>If necessary, stop and restart it:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb kill-server
+adb start-server</code></pre>
+      </div>
+
+      <h2>Problem 6 &mdash; <code>adb reverse</code> gives <code>more than one device/emulator</code></h2>
+
+      <p>React Native may show:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb.exe: error: more than one device/emulator</code></pre>
+      </div>
+
+      <p>when trying:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb reverse tcp:8081 tcp:8081</code></pre>
+      </div>
+
+      <p>If multiple devices are connected, specify the device:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081</code></pre>
+      </div>
+
+      <p>For example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb -s 192.168.1.15:5555 reverse tcp:8081 tcp:8081</code></pre>
+      </div>
+
+      <p>Then verify:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb -s 192.168.1.15:5555 reverse --list</code></pre>
+      </div>
+
+      <p>Expected:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>192.168.1.15:5555 tcp:8081 tcp:8081</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Note
+        </div>
+        <p><code>adb reverse</code> is normally useful when the device is connected through ADB and the Android device needs to access a service running on the PC.</p>
+      </div>
+
+      <h2>Problem 7 &mdash; ADB connects but React Native says "No apps connected"</h2>
+
+      <p>You may see:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>INFO  Dev server ready.</code></pre>
+      </div>
+
+      <p>followed by:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>warn No apps connected.</code></pre>
+      </div>
+
+      <p>This does not necessarily mean ADB is broken.</p>
+
+      <p>First check:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb devices</code></pre>
+      </div>
+
+      <p>You need to see:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>PHONE_IP:5555    device</code></pre>
+      </div>
+
+      <p>Then make sure the React Native application has actually been installed and launched.</p>
+
+      <div class="callout callout-tip">
+        <div class="callout-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Tip
+        </div>
+        <p>If the APK was successfully installed but Metro cannot connect, continue to the <a href="metro-problems.html">Metro / Port 8081 troubleshooting section</a>.</p>
+      </div>
+
+      <h2>Problem 8 &mdash; ADB connection works but APK installation fails</h2>
+
+      <p>If you see:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Installing APK 'app-debug.apk'</code></pre>
+      </div>
+
+      <p>then ADB has already detected the phone.</p>
+
+      <p>At this point, don't immediately troubleshoot the Wi-Fi connection. Instead, read the actual installation error.</p>
+
+      <p>For example:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>InstallException: EOF</code></pre>
+      </div>
+
+      <p>or:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>Requested internal only, but not enough space</code></pre>
+      </div>
+
+      <p>These are installation/device problems and should be investigated separately.</p>
+
+      <h2>Quick ADB Recovery</h2>
+
+      <p>If ADB starts behaving strangely, try this sequence:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb kill-server
+adb start-server
+adb devices</code></pre>
+      </div>
+
+      <p>If using USB:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb tcpip 5555</code></pre>
+      </div>
+
+      <p>Find the phone's IP:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb shell ip addr show wlan0</code></pre>
+      </div>
+
+      <p>Disconnect USB and reconnect:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb connect PHONE_IP:5555</code></pre>
+      </div>
+
+      <p>Finally verify:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">bash</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>adb devices</code></pre>
+      </div>
+
+      <p>Expected:</p>
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-block-lang">text</span>
+          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+        </div>
+        <pre><code>List of devices attached
+PHONE_IP:5555    device</code></pre>
+      </div>
+
+      <h2>ADB Connection Checklist</h2>
+
+      <p>Before moving to React Native:</p>
+      <ul>
+        <li>Developer Options enabled</li>
+        <li>USB debugging enabled</li>
+        <li>USB connection works</li>
+        <li><code>adb devices</code> shows <code>device</code></li>
+        <li><code>adb tcpip 5555</code> succeeds</li>
+        <li>Phone and PC are on the same network</li>
+        <li>Current phone IP was checked</li>
+        <li><code>adb connect PHONE_IP:5555</code> succeeds</li>
+        <li><code>adb devices</code> shows <code>PHONE_IP:5555 device</code></li>
+        <li>No unexpected extra devices/emulators are connected</li>
+      </ul>
+
+      <p>Once all of these are working, ADB wireless debugging is ready for React Native.</p>
+
+      <nav class="page-nav">
+        <a href="wireless-setup.html">
+          <div class="page-nav-label">Previous</div>
+          <div class="page-nav-title">&larr; Wireless ADB Setup</div>
+        </a>
+        <a href="sdk-problems.html" class="next">
+          <div class="page-nav-label">Next</div>
+          <div class="page-nav-title">SDK Problems &rarr;</div>
+        </a>
+      </nav>
+      </article>
+    </main>
+  </div>
+
+  <script src="js/search-index.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

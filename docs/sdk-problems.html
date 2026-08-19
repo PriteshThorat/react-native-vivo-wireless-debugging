@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>SDK Problems - React Native + Vivo Debugging</title>
+  <meta name="description" content="Common Android SDK-related problems that can prevent a React Native project from building or installing, with solutions for Windows.">
+  <meta name="keywords" content="Android SDK, SDK location not found, local.properties, Gradle, Build Tools, React Native build errors">
+  <link rel="canonical" href="https://priteshthorat.github.io/react-native-vivo-wireless-debugging/sdk-problems.html">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="layout">
+    <header class="mobile-header">
+      <button class="mobile-menu-btn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="mobile-header-title">RN + Vivo Debugging</span>
+    </header>
+    <div class="sidebar-overlay"></div>
+
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>RN + Vivo Debugging</h1>
+        <div class="sidebar-subtitle">Troubleshooting Guide</div>
+      </div>
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" placeholder="Search docs..." aria-label="Search documentation">
+        </div>
+        <div class="search-results"></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-section-title">Getting Started</span>
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="wireless-setup.html" class="nav-link">Wireless ADB Setup</a>
+        </div>
+        <div class="nav-section">
+          <span class="nav-section-title">Troubleshooting</span>
+          <a href="adb-connection.html" class="nav-link">ADB Connection Problems</a>
+          <a href="sdk-problems.html" class="nav-link active">SDK Problems</a>
+          <a href="apk-installation.html" class="nav-link">APK Installation</a>
+          <a href="metro-problems.html" class="nav-link">Metro &amp; Port 8081</a>
+        </div>
+        <div class="nav-section">
+          <span class="nav-section-title">Reference</span>
+          <a href="troubleshooting.html" class="nav-link">Troubleshooting Flow</a>
+          <a href="commands.html" class="nav-link">Important Commands</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="theme-toggle" aria-label="Toggle theme">
+          <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <span class="theme-label">Dark mode</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <article class="content">
+        <h1>React Native SDK Problems</h1>
+        <p class="subtitle">This section covers common Android SDK-related problems that can prevent a React Native project from building or installing.</p>
+
+        <h2>Problem 1 &mdash; <code>SDK location not found</code></h2>
+
+        <p>Example:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>SDK location not found. Define a valid SDK location
+with an ANDROID_HOME environment variable or by setting
+the sdk.dir path in your project's local properties file.</code></pre>
+        </div>
+
+        <p>This means Gradle cannot find the Android SDK.</p>
+
+        <h3>Check the Android SDK location</h3>
+
+        <p>On a typical Windows installation, the Android SDK is located at:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>C:\Users&lt;USERNAME&gt;\AppData\Local\Android\Sdk</code></pre>
+        </div>
+
+        <p>You can verify it from:<br>
+        <strong>Android Studio &rarr; Settings &rarr; Languages &amp; Frameworks &rarr; Android SDK</strong></p>
+
+        <h3>Solution A &mdash; Create <code>local.properties</code></h3>
+
+        <p>Inside your React Native project, open:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>android/local.properties</code></pre>
+        </div>
+
+        <p>If the file does not exist, create it. Add:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">properties</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>sdk.dir=C:/Users/Admin/AppData/Local/Android/Sdk</code></pre>
+        </div>
+
+        <div class="callout callout-important">
+          <div class="callout-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Important
+          </div>
+          <p>On Windows, using <code>/</code> instead of <code>\</code> avoids many path-escaping problems.</p>
+        </div>
+
+        <p>Then clean the project:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>cd android
+gradlew clean
+cd ..</code></pre>
+        </div>
+
+        <p>Run React Native again:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>npx react-native run-android</code></pre>
+        </div>
+
+        <h2>Problem 2 &mdash; Incorrect Windows path in <code>local.properties</code></h2>
+
+        <p>A common mistake is:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">properties</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>sdk.dir=C:\Users\&lt;USERNAME&gt;\AppData\Local\Android\Sdk</code></pre>
+        </div>
+
+        <p>This can cause errors such as:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>The filename, directory name, or volume label syntax is incorrect.</code></pre>
+        </div>
+
+        <p>Use:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">properties</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>sdk.dir=C:/Users/Admin/AppData/Local/Android/Sdk</code></pre>
+        </div>
+
+        <p>instead.</p>
+
+        <p>Alternatively, escape the backslashes:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">properties</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>sdk.dir=C:\\Users\\Admin\\AppData\\Local\\Android\\Sdk</code></pre>
+        </div>
+
+        <p>The first format is generally simpler:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">properties</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>sdk.dir=C:/Users/Admin/AppData/Local/Android/Sdk</code></pre>
+        </div>
+
+        <h2>Problem 3 &mdash; Android SDK components are missing</h2>
+
+        <p>Even if Gradle can find the SDK, the project may fail because required SDK components are not installed.</p>
+
+        <p>For example:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>Failed to find Build Tools revision ...</code></pre>
+        </div>
+
+        <p>or:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>Failed to install the following Android SDK packages</code></pre>
+        </div>
+
+        <p>Open: <strong>Android Studio &rarr; SDK Manager</strong></p>
+
+        <p>Check that the required components are installed. Common components include:</p>
+        <ul>
+          <li>Android SDK Platform</li>
+          <li>Android SDK Build-Tools</li>
+          <li>Android SDK Platform-Tools</li>
+          <li>Android SDK Command-line Tools</li>
+          <li>Android SDK Tools required by the project</li>
+        </ul>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            Tip
+          </div>
+          <p>The exact Android API level and Build Tools version required depends on your React Native project's Gradle configuration.</p>
+        </div>
+
+        <p>After installing the required components, try:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>npx react-native run-android</code></pre>
+        </div>
+
+        <h2>Problem 4 &mdash; Check whether ADB is installed correctly</h2>
+
+        <p>ADB is included in Android SDK Platform-Tools.</p>
+
+        <p>Run:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>adb version</code></pre>
+        </div>
+
+        <p>Example:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>Android Debug Bridge version 1.0.41
+Version 36.0.0-13206524</code></pre>
+        </div>
+
+        <p>Check where Windows is finding ADB:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>where adb</code></pre>
+        </div>
+
+        <p>Example:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>C:\Users&lt;USERNAME&gt;\AppData\Local\Android\Sdk\platform-tools\adb.exe</code></pre>
+        </div>
+
+        <p>If <code>adb</code> is not recognized, add the Android SDK <code>platform-tools</code> directory to your Windows <code>PATH</code>.</p>
+
+        <p>Typical path:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>C:\Users&lt;USERNAME&gt;\AppData\Local\Android\Sdk\platform-tools</code></pre>
+        </div>
+
+        <p>After changing <code>PATH</code>, open a new terminal and run:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>adb version</code></pre>
+        </div>
+
+        <h2>Problem 5 &mdash; Check the Java version</h2>
+
+        <p>React Native's Android build system also depends on Java.</p>
+
+        <p>Check the installed version:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>java -version</code></pre>
+        </div>
+
+        <p>For the environment used while creating this guide:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>java version "17.0.18"</code></pre>
+        </div>
+
+        <p>You can also check:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>echo %JAVA_HOME%</code></pre>
+        </div>
+
+        <p>If Gradle reports Java-related errors, verify that <code>JAVA_HOME</code> points to the intended JDK installation.</p>
+
+        <div class="callout callout-important">
+          <div class="callout-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Important
+          </div>
+          <p>Do not blindly change Java versions just because a different version is mentioned online. Use the Java version supported by your specific React Native/Android Gradle Plugin setup.</p>
+        </div>
+
+        <h2>Problem 6 &mdash; Clean the Android build</h2>
+
+        <p>If the SDK configuration has been corrected but Gradle still behaves as if the old configuration is being used, clean the Android project:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>cd android
+gradlew clean
+cd ..</code></pre>
+        </div>
+
+        <p>Then run:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>npx react-native run-android</code></pre>
+        </div>
+
+        <p>If you use the Gradle wrapper directly from the Android directory, the command is:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>gradlew clean</code></pre>
+        </div>
+
+        <h2>Problem 7 &mdash; <code>react-native doctor</code></h2>
+
+        <p>React Native provides a diagnostic command that can detect common development-environment problems.</p>
+
+        <p>Run:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>npx react-native doctor</code></pre>
+        </div>
+
+        <p>The doctor command can help identify problems with:</p>
+        <ul>
+          <li>Android SDK</li>
+          <li>Android SDK tools</li>
+          <li>JDK</li>
+          <li>Android Studio</li>
+          <li>Environment variables</li>
+          <li>Connected Android devices</li>
+        </ul>
+
+        <p>Follow the specific recommendations reported by the command rather than changing unrelated configuration.</p>
+
+        <h2>Verify the Complete Android Environment</h2>
+
+        <p>Before troubleshooting the React Native application itself, verify:</p>
+
+        <h3>1. Java</h3>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>java -version</code></pre>
+        </div>
+
+        <h3>2. ADB</h3>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>adb version</code></pre>
+        </div>
+
+        <h3>3. Android SDK</h3>
+
+        <p>Check <code>android/local.properties</code> and make sure it contains the correct SDK path:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">properties</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>sdk.dir=C:/Users/Admin/AppData/Local/Android/Sdk</code></pre>
+        </div>
+
+        <h3>4. Connected device</h3>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>adb devices</code></pre>
+        </div>
+
+        <p>Expected:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>List of devices attached
+PHONE_IP:5555    device</code></pre>
+        </div>
+
+        <h3>5. React Native environment</h3>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>npx react-native doctor</code></pre>
+        </div>
+
+        <h2>Recommended Recovery Sequence</h2>
+
+        <p>If the project suddenly starts reporting SDK-related errors:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>cd android
+gradlew clean
+cd ..</code></pre>
+        </div>
+
+        <p>Then verify:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">cmd</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>java -version
+adb version
+adb devices</code></pre>
+        </div>
+
+        <p>Check <code>android/local.properties</code> &mdash; make sure the SDK path is correct:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">properties</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>sdk.dir=C:/Users/Admin/AppData/Local/Android/Sdk</code></pre>
+        </div>
+
+        <p>Then run:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">bash</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>npx react-native run-android</code></pre>
+        </div>
+
+        <h2>Important: Don't Confuse SDK Errors with ADB Errors</h2>
+
+        <p>These are different problems.</p>
+
+        <h3>SDK/build problem</h3>
+
+        <p>Examples:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>SDK location not found</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>Failed to find Build Tools</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>Could not determine the dependencies</code></pre>
+        </div>
+
+        <p>Investigate: <strong>Android SDK / Gradle / Java / project configuration</strong></p>
+
+        <h3>ADB/device problem</h3>
+
+        <p>Examples:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>offline</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>cannot connect to PHONE_IP:5555</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>more than one device/emulator</code></pre>
+        </div>
+
+        <p>Investigate: <strong>ADB / USB / Wi-Fi / connected devices</strong></p>
+
+        <h3>APK installation problem</h3>
+
+        <p>Examples:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>InstallException: EOF</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header">
+            <span class="code-block-lang">text</span>
+            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
+          </div>
+          <pre><code>Requested internal only, but not enough space</code></pre>
+        </div>
+
+        <p>Investigate: <strong>Phone storage / APK installation / device communication</strong></p>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Important
+          </div>
+          <p><strong>Most important rule:</strong> If Gradle successfully builds the APK and reaches <code>installDebug</code>, the Android SDK/build process has already progressed far enough. Read the installation error before changing SDK configuration.</p>
+        </div>
+
+        <nav class="page-nav">
+          <a href="adb-connection.html">
+            <div class="page-nav-label">Previous</div>
+            <div class="page-nav-title">&larr; ADB Connection Problems</div>
+          </a>
+          <a href="apk-installation.html" class="next">
+            <div class="page-nav-label">Next</div>
+            <div class="page-nav-title">APK Installation &rarr;</div>
+          </a>
+        </nav>
+      </article>
+    </main>
+  </div>
+
+  <script src="js/search-index.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
