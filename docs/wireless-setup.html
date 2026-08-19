@@ -323,32 +323,20 @@ npx react-native run-android</code></pre>
 
         <p>The complete process is:</p>
 
-        <div class="code-block">
-          <div class="code-block-header">
-            <span class="code-block-lang">text</span>
-            <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
-          </div>
-          <pre><code>Enable USB debugging
-        |
-Connect USB
-        |
-adb devices
-        |
-device
-        |
-adb tcpip 5555
-        |
-Find phone IP
-        |
-Disconnect USB
-        |
-adb connect PHONE_IP:5555
-        |
-adb devices
-        |
-PHONE_IP:5555    device
-        |
-npx react-native run-android</code></pre>
+        <div class="mermaid">
+flowchart TD
+    A["Enable USB debugging"] --> B["Connect USB"]
+    B --> C["adb devices"]
+    C --> D{"device found?"}
+    D -->|Yes| E["adb tcpip 5555"]
+    D -->|No| C
+    E --> F["Find phone IP"]
+    F --> G["Disconnect USB"]
+    G --> H["adb connect PHONE_IP:5555"]
+    H --> I["adb devices"]
+    I --> J{"PHONE_IP:5555 device?"}
+    J -->|Yes| K["npx react-native run-android"]
+    J -->|No| H
         </div>
 
         <h2>Commands to Remember</h2>
@@ -388,7 +376,17 @@ npx react-native run-android</code></pre>
     </main>
   </div>
 
-  <script src="js/search-index.js"></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: isDark ? 'dark' : 'default',
+    themeVariables: { fontSize: '15px' },
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+  });
+</script>
+<script src="js/search-index.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
