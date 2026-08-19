@@ -64,69 +64,39 @@
       <h1>Quick Troubleshooting Flow</h1>
       <p>Use this flow when React Native wireless debugging stops working.</p>
 
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">text</span>
-          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
-        </div>
-        <pre><code>                         START
-                           |
-                    adb devices -l
-                           |
-              +------------+------------+
-              |                         |
-          No device                  device
-              |                         |
-       Check ADB/USB/Wi-Fi        Run React Native
-              |                         |
-       adb connect IP:5555          run-android
-              |                         |
-           device              +--------+--------+
-                                |                |
-                          Build error       Build successful
-                                |                |
-                         SDK/Gradle/Java    APK installation
-                                                 |
-                                        +--------+--------+
-                                        |                 |
-                                   Installation       Installation
-                                     fails             succeeds
-                                        |                 |
-                                  Read exact          App launches
-                                     error                 |
-                                        |           +------+------+
-                             +----------+----------+ |             |
-                             |          |          | Works       Doesn't
-                           EOF     No space   offline             |
-                             |          |          |          Metro problem
-                           ADB      Free phone   Fix ADB          |
-                          problem    storage     connection   Metro running?
-                                                               |
-                                                         +-----+-----+
-                                                         |           |
-                                                        NO          YES
-                                                         |           |
-                                                 npx react-    Check port
-                                                 native start      8081
-                                                                    |
-                                                         +----------+----------+
-                                                         |                     |
-                                                     adb reverse          Direct Wi-Fi
-                                                         |                     |
-                                                tcp:8081 tcp:8081       PC_IP:8081
-                                                         |                     |
-                                                       Works?              Browser test
-                                                         |                     |
-                                                    +----+----+          +-----+-----+
-                                                    |         |          |           |
-                                                   YES       NO         Works       Fails
-                                                    |         |          |           |
-                                                 Metro OK   ADB/       Network     Firewall/
-                                                            config     OK          router/
-                                                                          |           isolation
-                                                                       Check React Native   Check
-                                                                       config                network</code></pre>
-      </div>
+    <div class="mermaid">
+flowchart TD
+    A[START] --> B["adb devices -l"]
+    B --> C{"No device or device?"}
+    C -->|"No device"| D["Check ADB/USB/Wi-Fi"]
+    D --> E["adb connect IP:5555"]
+    E --> F{"device found?"}
+    F -->|Yes| G["Run React Native run-android"]
+    F -->|No| D
+    C -->|device| G
+    G --> H{"Build error or success?"}
+    H -->|"Build error"| I["SDK/Gradle/Java"]
+    H -->|"Build successful"| J["APK installation"]
+    J --> K{"Installation result?"}
+    K -->|"Fails"| L["Read exact error"]
+    K -->|"Succeeds"| M{"App launches?"}
+    L --> N{"Error type?"}
+    N -->|EOF| O["ADB problem"]
+    N -->|"No space"| P["Free phone storage"]
+    N -->|offline| Q["Fix ADB connection"]
+    M -->|"Works"| R["Metro OK"]
+    M -->|"Doesn't work"| S["Metro problem"]
+    S --> T{"Metro running?"}
+    T -->|NO| U["npx react-native start"]
+    T -->|YES| V["Check port 8081"]
+    V --> W{"adb reverse or Direct Wi-Fi?"}
+    W -->|"adb reverse tcp:8081"| X{"Works?"}
+    X -->|YES| R
+    X -->|NO| Y["Check React Native config"]
+    W -->|"Direct Wi-Fi PC_IP:8081"| Z{"Browser test"}
+    Z -->|Works| AA["Network OK"]
+    Z -->|Fails| AB["Firewall/router/network isolation"]
+    </div>
 
       <h2>1. Check the Device</h2>
 
@@ -557,6 +527,16 @@ Unable to load script</code></pre>
     </main>
   </div>
 
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: isDark ? 'dark' : 'default',
+      themeVariables: { fontSize: '15px' },
+      flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' }
+    });
+  </script>
   <script src="js/search-index.js"></script>
   <script src="js/main.js"></script>
 </body>

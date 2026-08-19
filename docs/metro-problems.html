@@ -694,50 +694,27 @@ Router client isolation?</code></pre>
 
       <h2>Quick Metro Troubleshooting Flow</h2>
 
-      <div class="code-block">
-        <div class="code-block-header">
-          <span class="code-block-lang">text</span>
-          <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
-        </div>
-        <pre><code>                START
-                  |
-           Is Metro running?
-             |          |
-            NO          YES
-             |           |
-     npx react-native   Check device
-          start          connection
-                          |
-                    adb devices
-                          |
-                  Device = device?
-                    |          |
-                   NO         YES
-                    |          |
-              Fix ADB       App launches?
-                               |
-                         +-----+-----+
-                         |           |
-                        NO          YES
-                         |           |
-                   Check APK       Unable to
-                   installation    load script
-                                     |
-                              Check port 8081
-                                     |
-                           +---------+---------+
-                           |                   |
-                     adb reverse          Direct Wi-Fi
-                           |                   |
-                    tcp:8081              PC_IP:8081
-                           |                   |
-                       Works?             Browser test
-                           |                   |
-                          YES                 FAIL
-                           |                   |
-                       Metro OK       Firewall/router/
-                                      network problem</code></pre>
-      </div>
+    <div class="mermaid">
+flowchart TD
+    A[START] --> B{"Is Metro running?"}
+    B -->|NO| C["npx react-native start"]
+    B -->|YES| D["Check device connection"]
+    D --> E["adb devices"]
+    E --> F{"Device = device?"}
+    F -->|NO| G["Fix ADB"]
+    F -->|YES| H{"App launches?"}
+    H -->|NO| I["Check APK installation"]
+    H -->|YES| J{"Unable to load script?"}
+    J -->|No| K["Metro OK"]
+    J -->|Yes| L["Check port 8081"]
+    L --> M{"Which method?"}
+    M -->|"adb reverse tcp:8081"| N{"Works?"}
+    N -->|YES| K
+    N -->|NO| O["Check React Native config"]
+    M -->|"Direct Wi-Fi PC_IP:8081"| P{"Browser test"}
+    P -->|Works| Q["Network OK"]
+    P -->|FAIL| R["Firewall/router/network problem"]
+    </div>
 
       <h2>Most Important IP Rule</h2>
 
@@ -913,6 +890,16 @@ Metro</code></pre>
     </main>
   </div>
 
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: isDark ? 'dark' : 'default',
+      themeVariables: { fontSize: '15px' },
+      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+    });
+  </script>
   <script src="js/search-index.js"></script>
   <script src="js/main.js"></script>
 </body>

@@ -21,6 +21,19 @@
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
     updateThemeIcon();
+    rerenderMermaid();
+  }
+
+  function rerenderMermaid() {
+    if (typeof mermaid !== 'undefined') {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default',
+        themeVariables: { fontSize: '15px' },
+        flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+      });
+      mermaid.run();
+    }
   }
 
   function updateThemeIcon() {

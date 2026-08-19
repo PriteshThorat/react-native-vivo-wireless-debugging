@@ -947,3 +947,24 @@ a:hover {
     padding: 0;
   }
 }
+
+/* --- Mermaid Diagrams --- */
+.mermaid {
+  text-align: center;
+  margin: 20px 0;
+  overflow-x: auto;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+  font-size: 15px;
+}
+
+.mermaid .nodeLabel {
+  font-size: 15px !important;
+}
+
+.mermaid .edgeLabel {
+  font-size: 13px;
+}

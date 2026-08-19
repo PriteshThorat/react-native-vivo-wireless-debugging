@@ -651,32 +651,20 @@ Phone: 192.168.1.15</code></pre>
     <!-- Troubleshooting Flow -->
     <h2>APK Installation Troubleshooting Flow</h2>
 
-    <div class="code-block">
-      <div class="code-block-header">
-        <span class="code-block-lang">text</span>
-        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
-      </div>
-      <pre><code>                 START
-                   |
-          Gradle builds APK?
-                   |
-                 YES
-                   |
-          :app:installDebug
-                   |
-        +----------+----------+
-        |                     |
-   Installation          Installation
-     succeeds               fails
-        |                     |
-    App starts?          Read exact error
-        |                     |
-       YES           +-------+--------+
-        |            |       |        |
-   Metro problem    EOF   No space   Offline
-        |            |       |        |
-   Check Metro    ADB     Free      Fix ADB
-   / port 8081   issue   storage   connection</code></pre>
+    <div class="mermaid">
+flowchart TD
+    A[START] --> B{"Gradle builds APK?"}
+    B -->|Yes| C[":app:installDebug"]
+    B -->|No| D["Fix Gradle/SDK"]
+    C --> E{"Installation result?"}
+    E -->|"Succeeds"| F{"App starts?"}
+    E -->|"Fails"| G["Read exact error"]
+    F -->|"Yes"| H["Metro problem - Check Metro / port 8081"]
+    F -->|"No"| G
+    G --> I{"Error type?"}
+    I -->|EOF| J["ADB issue"]
+    I -->|"No space"| K["Free storage"]
+    I -->|Offline| L["Fix ADB connection"]
     </div>
 
     <!-- Important Diagnostic Rule -->
@@ -684,20 +672,12 @@ Phone: 192.168.1.15</code></pre>
 
     <p>Do not treat every <code>run-android</code> failure as a build failure. There are three separate stages:</p>
 
-    <div class="code-block">
-      <div class="code-block-header">
-        <span class="code-block-lang">text</span>
-        <button class="code-block-copy" aria-label="Copy code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="copy-label">Copy</span></button>
-      </div>
-      <pre><code>React Native
-     |
-Gradle builds APK
-     |
-APK installation
-     |
-App launches
-     |
-Metro connection</code></pre>
+    <div class="mermaid">
+flowchart TD
+    A["React Native"] --> B["Gradle builds APK"]
+    B --> C["APK installation"]
+    C --> D["App launches"]
+    D --> E["Metro connection"]
     </div>
 
     <p>For example, <code>BUILD SUCCESSFUL</code> followed by <code>Unable to install app</code> means the <strong>build succeeded</strong> but installation failed.</p>
@@ -787,6 +767,16 @@ adb start-server</code></pre>
 </main>
 </div>
 
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: isDark ? 'dark' : 'default',
+    themeVariables: { fontSize: '15px' },
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+  });
+</script>
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
 </body>
