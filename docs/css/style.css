@@ -148,6 +148,11 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 60px;
+}
+
 body {
   font-family: var(--font-sans);
   font-size: 15px;
@@ -428,11 +433,11 @@ a:hover {
   left: 0;
   right: 0;
   height: 52px;
-  background: var(--color-bg-sidebar);
+  background: var(--mobile-header-bg);
   z-index: 150;
   align-items: center;
   padding: 0 16px;
-  border-bottom: 1px solid var(--sidebar-border-top);
+  border-bottom: 2px solid var(--color-accent);
 }
 
 .mobile-menu-btn {
@@ -454,6 +459,12 @@ a:hover {
 .mobile-menu-btn svg {
   width: 22px;
   height: 22px;
+}
+
+.mobile-header-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mobile-header-title {
@@ -852,25 +863,39 @@ a:hover {
   }
 
   .sidebar {
+    top: 52px;
+    bottom: 0;
+    height: calc(100vh - 52px);
+  }
+
+  .sidebar {
     transform: translateX(-100%);
     transition: transform 0.25s ease;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .sidebar.open {
     transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .main-content {
     margin-left: 0;
-    padding-top: 52px;
+    padding-top: 56px;
   }
 
   .content {
-    padding: 24px 20px 60px;
+    padding: 16px 20px 60px;
   }
 
   .content h1 {
     font-size: 24px;
+  }
+
+  .home-hero h1 {
+    font-size: 22px;
   }
 
   .content h2 {
@@ -916,6 +941,15 @@ a:hover {
   .content th, .content td {
     padding: 8px 10px;
   }
+
+  .mermaid {
+    margin: 12px -20px;
+    padding: 0 4px;
+  }
+
+  .mermaid svg {
+    font-size: 12px;
+  }
 }
 
 /* --- Scrollbar (main content) --- */
@@ -953,9 +987,11 @@ a:hover {
   text-align: center;
   margin: 20px 0;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mermaid svg {
+  min-width: 600px;
   max-width: 100%;
   height: auto;
   font-size: 15px;
