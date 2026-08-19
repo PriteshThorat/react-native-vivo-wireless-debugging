@@ -1,10 +1,10 @@
-# React Native + Vivo 1724 Wireless Debugging - Troubleshooting Guide
+# React Native Wireless Debugging - Troubleshooting Guide
 
 A practical troubleshooting guide for running React Native applications
-on a physical Vivo device using wireless ADB.
+on a physical Android device using wireless ADB.
 
-> This guide is based on a Vivo 1724 running Android 8.1.0.
-> Commands and settings may differ on newer Android/Vivo devices.
+> This guide is based on an Android 8.1.0 device.
+> Commands and settings may differ on newer Android versions.
 
 ## Table of Contents
 
@@ -23,7 +23,7 @@ This troubleshooting guide was created and tested using the following setup:
 
 | Component        | Details                 |
 | ---------------- | ----------------------- |
-| Device           | Vivo 1724               |
+| Device           | Android Device          |
 | Android Version  | Android 8.1.0           |
 | Debugging Method | ADB over Wi-Fi (TCP/IP) |
 | ADB Port         | `5555`                  |
@@ -50,13 +50,13 @@ I recommend keeping the **exact ADB, Java, Metro, and OS versions** because they
 
 ## 1. First-Time Wireless ADB Setup
 
-This section explains how to connect the Vivo 1724 to a Windows PC using **ADB over Wi-Fi (TCP/IP)**.
+This method is useful on devices where Android's Wireless Debugging feature is unavailable.
 
 > **Important:** This method is intended for older Android devices that do not have the newer **Wireless Debugging / Pairing** option.
 
 ### Step 1 - Enable Developer Options
 
-On the Vivo phone, open:
+On your device, open:
 
 **Settings → More settings → Developer options**
 
@@ -73,7 +73,7 @@ Tap the Build number repeatedly until Developer Options are enabled.
 
 ### Step 2 - Connect the Phone Using USB
 
-Connect the Vivo phone to your PC using a USB cable.
+Connect your device to your PC using a USB cable.
 
 Check whether ADB detects the device:
 
@@ -173,7 +173,7 @@ Once TCP/IP mode has been enabled and you know the phone's IP address, disconnec
 Make sure:
 
 - The PC is connected to Wi-Fi.
-- The Vivo is connected to the same local network.
+- The device is connected to the same local network.
 - The phone remains powered on.
 - USB debugging remains enabled.
 
@@ -240,7 +240,7 @@ Then run:
 npx react-native run-android
 ```
 
-React Native should detect the connected Vivo device and install the debug APK.
+React Native should detect the connected device and install the debug APK.
 
 ### Successful Setup
 
@@ -285,7 +285,7 @@ npx react-native run-android
 
 ## 2. ADB Connection Problems
 
-This section covers common problems when connecting the Vivo device to the PC using ADB.
+This section covers common problems when connecting the device to the PC using ADB.
 
 ---
 
@@ -1804,7 +1804,7 @@ adb -s PHONE_IP:5555 shell am start -n com.yourapp/.MainActivity
 
 ---
 
-> **Most important rule:** Always read the **actual error at the bottom of the installation step**. Warnings such as Gradle deprecation messages are usually unrelated to an APK installation failure. In the previous troubleshooting case, the real installation problem was **insufficient internal storage on the Vivo**, not Gradle or React Native.
+> **Most important rule:** Always read the **actual error at the bottom of the installation step**. Warnings such as Gradle deprecation messages are usually unrelated to an APK installation failure. In the previous troubleshooting case, the real installation problem was **insufficient internal storage on the device**, not Gradle or React Native.
 
 ## 5. Metro and Port 8081 Problems
 
@@ -2059,7 +2059,7 @@ For example:
 192.168.1.14
 ```
 
-On the Vivo phone, open the browser and enter:
+On your device, open the browser and enter:
 
 ```text
 http://192.168.1.14:8081
@@ -2492,7 +2492,7 @@ Suppose:
 PC Wi-Fi IPv4:
 192.168.1.14
 
-Vivo Wi-Fi IPv4:
+Device Wi-Fi IPv4:
 192.168.1.15
 ```
 
@@ -2610,7 +2610,7 @@ npx react-native run-android
 
 # Quick Troubleshooting Flow
 
-Use this flow when React Native wireless debugging stops working on the Vivo 1724.
+Use this flow when React Native wireless debugging stops working.
 
 ```text
                          START
@@ -2781,7 +2781,7 @@ Read the **actual installation error**.
 
 ### `Requested internal only, but not enough space`
 
-→ Free storage on the Vivo.
+→ Free storage on the device.
 
 ```cmd
 adb shell df -h /data
@@ -2865,7 +2865,7 @@ adb devices
 
 # 7. Try ADB Reverse
 
-For the connected Vivo:
+For the connected device:
 
 ```cmd
 adb -s PHONE_IP:5555 reverse tcp:8081 tcp:8081
@@ -3063,7 +3063,7 @@ Unable to load script
 
 # Important Commands
 
-These are the most useful commands for React Native + Vivo 1724 wireless debugging.
+These are the most useful commands for React Native wireless debugging.
 
 ---
 
@@ -3084,7 +3084,7 @@ adb devices -l
 Expected:
 
 ```text
-192.168.1.15:5555    device product:1724 model:vivo_1724 device:1724
+192.168.1.15:5555    device product:generic model:android_device device:generic
 ```
 
 ---

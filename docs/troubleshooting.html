@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <title>Quick Troubleshooting Flow — RN + Vivo Debugging Guide</title>
-  <meta name="description" content="Quick troubleshooting flowchart and step-by-step diagnostic procedures for React Native wireless debugging on Vivo devices.">
-  <meta name="keywords" content="troubleshooting flow, React Native, Vivo, wireless debugging, ADB, Metro, Gradle, APK installation">
-  <link rel="canonical" href="https://priteshthorat.github.io/react-native-vivo-wireless-debugging/troubleshooting.html">
+  <title>Quick Troubleshooting Flow — RN Wireless Debugging Guide</title>
+  <meta name="description" content="Quick troubleshooting flowchart and step-by-step diagnostic procedures for React Native wireless debugging on Android devices.">
+  <meta name="keywords" content="troubleshooting flow, React Native, wireless debugging, ADB, Metro, Gradle, APK installation">
+  <link rel="canonical" href="https://priteshthorat.github.io/react-native-wireless-debugging/troubleshooting.html">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -15,13 +15,13 @@
       <button class="mobile-menu-btn" aria-label="Open menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <span class="mobile-header-title">RN + Vivo Debugging</span>
+      <span class="mobile-header-title">RN Wireless Debugging</span>
     </header>
     <div class="sidebar-overlay"></div>
   <div class="layout">
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h1>RN + Vivo Debugging</h1>
+        <h1>RN Wireless Debugging</h1>
         <div class="sidebar-subtitle">Troubleshooting Guide</div>
       </div>
       <div class="search-container">
@@ -62,7 +62,7 @@
     <main class="main-content">
       <article class="content">
       <h1>Quick Troubleshooting Flow</h1>
-      <p>Use this flow when React Native wireless debugging stops working on the Vivo 1724.</p>
+      <p>Use this flow when React Native wireless debugging stops working.</p>
 
       <div class="code-block">
         <div class="code-block-header">
@@ -246,7 +246,7 @@ cd ..</code></pre>
       <p>If you see <code>BUILD SUCCESSFUL</code> but <code>:app:installDebug FAILED</code>, the build itself succeeded. Read the <strong>actual installation error</strong>.</p>
 
       <h3><code>Requested internal only, but not enough space</code></h3>
-      <p>-&gt; Free storage on the Vivo.</p>
+      <p>-&gt; Free storage on the device.</p>
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-block-lang">cmd</span>
@@ -325,7 +325,7 @@ INFO  Dev server ready.</code></pre>
 
       <h2>7. Try ADB Reverse</h2>
 
-      <p>For the connected Vivo:</p>
+      <p>For the connected device:</p>
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-block-lang">cmd</span>

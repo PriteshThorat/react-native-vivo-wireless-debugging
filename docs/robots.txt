@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://priteshthorat.github.io/react-native-vivo-wireless-debugging/sitemap.xml
+Sitemap: https://priteshthorat.github.io/react-native-wireless-debugging/sitemap.xml

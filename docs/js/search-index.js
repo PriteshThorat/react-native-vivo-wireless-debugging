@@ -3,12 +3,12 @@ window.__searchIndex = [
   {
     "title": "Home",
     "url": "index.html",
-    "content": "React Native Vivo 1724 Wireless Debugging Troubleshooting Guide. A practical troubleshooting guide for running React Native applications on a physical Vivo device using wireless ADB. Device Information: Vivo 1724, Android 8.1.0, ADB over Wi-Fi TCP/IP, port 5555, Windows 10, React Native, Metro 0.84.4, Java 17.0.18, ADB 36.0.0-13206524."
+    "content": "React Native Wireless Debugging Troubleshooting Guide. A practical troubleshooting guide for running React Native applications on a physical Android device using wireless ADB. Device Information: Android 8.1.0, ADB over Wi-Fi TCP/IP, port 5555, Windows 10, React Native, Metro 0.84.4, Java 17.0.18, ADB 36.0.0-13206524."
   },
   {
     "title": "First-Time Wireless ADB Setup",
     "url": "wireless-setup.html",
-    "content": "How to connect the Vivo 1724 to a Windows PC using ADB over Wi-Fi TCP/IP. Enable Developer Options, USB debugging, adb tcpip 5555, find phone IP, adb connect PHONE_IP:5555. Step-by-step setup guide for older Android devices without the newer Wireless Debugging Pairing option."
+    "content": "How to connect the device to a Windows PC using ADB over Wi-Fi TCP/IP. Enable Developer Options, USB debugging, adb tcpip 5555, find phone IP, adb connect PHONE_IP:5555. Step-by-step setup guide for older Android devices without the newer Wireless Debugging Pairing option."
   },
   {
     "title": "ADB Connection Problems",
@@ -38,6 +38,6 @@ window.__searchIndex = [
   {
     "title": "Important Commands",
     "url": "commands.html",
-    "content": "Command reference for React Native Vivo wireless debugging. ADB device commands, USB to wireless ADB, ADB reverse for Metro, APK commands, Metro commands, network commands, device storage, React Native Gradle cleanup. adb devices, adb tcpip 5555, adb connect, adb reverse, ipconfig, netstat, gradlew clean, npx react-native start, npx react-native run-android."
+    "content": "Command reference for React Native wireless debugging. ADB device commands, USB to wireless ADB, ADB reverse for Metro, APK commands, Metro commands, network commands, device storage, React Native Gradle cleanup. adb devices, adb tcpip 5555, adb connect, adb reverse, ipconfig, netstat, gradlew clean, npx react-native start, npx react-native run-android."
   }
 ];
